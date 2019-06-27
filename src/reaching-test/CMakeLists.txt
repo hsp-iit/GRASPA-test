@@ -22,6 +22,9 @@ find_package(ICUB REQUIRED)
 # Application source files
 set(${EXE_TARGET_NAME}_SRC
     src/main.cpp
+    src/pugixml.cpp
+    #src/pugixml.hpp
+    #src/pugiconfig.hpp
     )
 set(${EXE_TARGET_NAME}_THRIFT_HDR src/idl.thrift)
 

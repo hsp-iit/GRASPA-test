@@ -15,6 +15,8 @@
 #include <yarp/dev/CartesianControl.h>
 #include <yarp/dev/PolyDriver.h>
 
+#include <pugixml.hpp>
+
 #include "src/ReachingTest_IDL.h"
 
 using namespace std;
@@ -27,6 +29,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 {
     string port_prefix;
     string file_layout;
+
+    pugi::xml_document parsed_file;
 
     // Poses to be reached
     vector<Vector> poses_layout;
@@ -107,6 +111,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         //  attach callback
         attach(user_rpc);
 
+        parse_xml(file_layout.c_str());
+
         return true;
     }
 
@@ -159,9 +165,33 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     }
 
     /****************************************************************/
-    void parse_xml()
+    void parse_xml(const char* file)
     {
+        yDebug() << "Parsing file: " << file;
+        parsed_file.load_file(file);
 
+        pugi::xml_node root = parsed_file.child("Scene");
+
+        string namePanel;
+
+        for (pugi::xml_node panel = root.first_child(); panel; panel = panel.next_sibling())
+        {
+            for (pugi::xml_node child = panel.first_child(); child; child = child.next_sibling())
+            {
+                for (pugi::xml_node attr = child.first_child(); attr; attr = attr.next_sibling())
+                {
+                    yInfo() << attr.name();
+
+                    for (pugi::xml_node row = attr.first_child().first_child(); row; row = row.first_child().first_child())
+                    {
+                        for (pugi::xml_attribute attr = row.first_attribute(); attr; attr = attr.next_attribute())
+                        {
+                            yInfo() << attr.name() << attr.value();
+                        }
+                    }
+                }
+            }
+        }
     }
 };
 
