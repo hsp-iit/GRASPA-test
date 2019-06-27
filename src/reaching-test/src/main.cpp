@@ -170,6 +170,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         yDebug() << "Parsing file: " << file;
         parsed_file.load_file(file);
 
+        Matrix transform(4,4);
+        vector<Matrix> poses;
+
         pugi::xml_node root = parsed_file.child("Scene");
 
         string namePanel;
@@ -180,17 +183,34 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             {
                 for (pugi::xml_node attr = child.first_child(); attr; attr = attr.next_sibling())
                 {
-                    yInfo() << attr.name();
+                    //yInfo() << attr.name();
 
-                    for (pugi::xml_node row = attr.first_child().first_child(); row; row = row.first_child().first_child())
+                    int i = 0;
+
+                    for (pugi::xml_node row = attr.first_child().first_child(); row; row = row.next_sibling())
                     {
+                        //yInfo() << row.name();
+
+                        int j = 0;
+
                         for (pugi::xml_attribute attr = row.first_attribute(); attr; attr = attr.next_attribute())
                         {
                             yInfo() << attr.name() << attr.value();
+                            transform(i,j)=attr.as_double();
+                            j++;
                         }
+
+                        i++;
                     }
+
+                    poses.push_back(transform);
                 }
             }
+        }
+
+        for (size_t i = 0;  i < poses.size(); i++ )
+        {
+            yDebug()<< poses[i].toString();
         }
     }
 };
