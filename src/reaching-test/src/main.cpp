@@ -229,7 +229,16 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
         pose_count ++;
 
-        yInfo() << log_ID << "Pose no. " << pose_count;
+        if (pose_count < poses_layout.size())
+        {
+            yInfo() << log_ID << "Pose no. " << pose_count;
+            return true;
+        }
+        else
+        {
+            yInfo() << log_ID << "Already at the last pose" ;
+            return false;
+        }
     }
 
     /****************************************************************/
@@ -237,9 +246,16 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "[ask_new_pose]";
 
-        yInfo() << log_ID << " Next pose to be executed: no. : "<< pose_count << ", value: " << poses_layout[pose_count].toString();
-
-        return poses_layout[pose_count];
+        if (pose_count < poses_layout.size())
+        {
+            yInfo() << log_ID << " Next pose to be executed: no. : "<< pose_count << ", value: " << poses_layout[pose_count].toString();
+            return poses_layout[pose_count];
+        }
+        else
+        {
+            Vector tmp(7,0.0);
+            return tmp;
+        }
     }
 
     /****************************************************************/
@@ -250,48 +266,54 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
         string log_ID = "[execute_new_pose]";
 
-        if (arm == robot_arm || robot_arm == "both")
+        if (pose_count < poses_layout.size())
         {
-            if (arm == "left")
+
+            if (arm == robot_arm || robot_arm == "both")
             {
-                yInfo() << log_ID << "Going to position: " << poses_layout[pose_count].subVector(0,2).toString() << "with orientation: " << poses_layout[pose_count].subVector(3,6).toString();
-                icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
-                icart_left->waitMotionDone(0.4);
-                icart_left->getPose(reached_position, reached_orientation);
+                if (arm == "left")
+                {
+                    yInfo() << log_ID << "Going to position: " << poses_layout[pose_count].subVector(0,2).toString() << "with orientation: " << poses_layout[pose_count].subVector(3,6).toString();
+                    icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
+                    icart_left->waitMotionDone(0.4);
+                    icart_left->getPose(reached_position, reached_orientation);
 
-                yInfo() << log_ID << "Going to home position";
-                icart_left->goToPoseSync(home_pos_left, home_orie_left);
-                icart_left->waitMotionDone(0.4);
+                    yInfo() << log_ID << "Going to home position";
+                    icart_left->goToPoseSync(home_pos_left, home_orie_left);
+                    icart_left->waitMotionDone(0.4);
+                }
+                else if (arm == "right")
+                {
+                    yInfo() << log_ID << "Going to position: " << poses_layout[pose_count].subVector(0,2).toString() << "with orientation: " << poses_layout[pose_count].subVector(3,6).toString();
+                    icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
+                    icart_right->waitMotionDone(0.4);
+                    icart_right->getPose(reached_position, reached_orientation);
+
+                    yInfo() << log_ID << "Going to home position" << home_pos_right.toString() << home_orie_right.toString();
+                    icart_right->goToPoseSync(home_pos_right, home_orie_right);
+                    icart_right->waitMotionDone(0.4);
+                }
+
+                yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
+
+                Vector reached_pose(7,0.0);
+
+                reached_pose.setSubvector(0, reached_position);
+                reached_pose.setSubvector(3,reached_orientation);
+                reached_poses.push_back(reached_pose);
+
+                pose_count++;
+
+                return true;
             }
-            else if (arm == "right")
+            else
             {
-                yInfo() << log_ID << "Going to position: " << poses_layout[pose_count].subVector(0,2).toString() << "with orientation: " << poses_layout[pose_count].subVector(3,6).toString();
-                icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
-                icart_right->waitMotionDone(0.4);
-                icart_right->getPose(reached_position, reached_orientation);
-
-                yInfo() << log_ID << "Going to home position" << home_pos_right.toString() << home_orie_right.toString();
-                icart_right->goToPoseSync(home_pos_right, home_orie_right);
-                icart_right->waitMotionDone(0.4);
+                yError() << log_ID << "Not valid arm!";
+                return false;
             }
-
-            yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
-
-            Vector reached_pose(7,0.0);
-
-            reached_pose.setSubvector(0, reached_position);
-            reached_pose.setSubvector(3,reached_orientation);
-            reached_poses.push_back(reached_pose);
-
-            pose_count++;
-
-            return true;
         }
         else
-        {
-            yError() << log_ID << "Not valid arm!";
             return false;
-        }
     }
 
     /****************************************************************/
