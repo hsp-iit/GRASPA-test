@@ -7,6 +7,8 @@
 
 #include <cstdlib>
 #include <string>
+#include <iomanip>
+#include <sstream>
 
 #include <yarp/os/all.h>
 #include <yarp/sig/all.h>
@@ -51,6 +53,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     // Robot params
     string robot;
     string robot_arm;
+
+    // Home positions
+    Vector home_pos_left, home_orie_left;
+    Vector home_pos_right, home_orie_right;
 
     // Devices
     PolyDriver left_arm_client, right_arm_client;
@@ -109,6 +115,15 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 else
                 {
                     left_arm_client.view(icart_left);
+
+                    Vector dof;
+                    icart_left->getDOF(dof);
+                    Vector new_dof(10, 1);
+                    new_dof(1) = 0.0;
+                    icart_left->setDOF(new_dof, dof);
+                    icart_left->setInTargetTol(0.001);
+
+                    icart_left->getPose(home_pos_left, home_orie_left);
                 }
             }
             if ((robot_arm == "both") || (robot_arm == "right"))
@@ -125,6 +140,13 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 else
                 {
                     right_arm_client.view(icart_right);
+                    Vector dof;
+                    icart_right->getDOF(dof);
+                    Vector new_dof(10, 1);
+                    new_dof(1) = 0.0;
+                    icart_right->setDOF(new_dof, dof);
+                    icart_right->setInTargetTol(0.001);
+                    icart_right->getPose(home_pos_right, home_orie_right);
                 }
             }
         }
@@ -157,7 +179,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     /****************************************************************/
     bool updateModule()
     {
-        return false;
+        return true;
     }
 
     /****************************************************************/
@@ -221,7 +243,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     }
 
     /****************************************************************/
-    bool execute_new_pose(string &arm)
+    bool execute_new_pose(const string &arm)
     {
         Vector reached_position(3,0.0);
         Vector reached_orientation(4,0.0);
@@ -236,6 +258,11 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
                 icart_left->waitMotionDone(0.4);
                 icart_left->getPose(reached_position, reached_orientation);
+
+                icart_left->goToPoseSync(home_pos_left, home_orie_left);
+                icart_left->waitMotionDone(0.4);
+
+
             }
             else if (arm == "right")
             {
@@ -243,9 +270,12 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
                 icart_right->waitMotionDone(0.4);
                 icart_right->getPose(reached_position, reached_orientation);
+
+                icart_left->goToPoseSync(home_pos_right, home_orie_right);
+                icart_left->waitMotionDone(0.4);
             }
 
-            yInfo() << log_ID << "Reached position: " << reached_position.subVector(0,2).toString() << "with orientation: " << reached_orientation.subVector(3,6).toString();
+            yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
 
             Vector reached_pose(7,0.0);
 
@@ -283,14 +313,44 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 string string_j = to_string(j);
                 pugi::xml_node object = root.append_child("ManipulationObject");
                 object.append_attribute("name") = ("Reachable_frame"+string_j+string_i).c_str();
+                pugi::xml_node file = object.append_child("File");
+                file.set_value("objects/frame.xml");
+                pugi::xml_node global_pose = object.append_child("GlobalPose");
+                pugi::xml_node transform = global_pose.append_child("Transform");
+                pugi::xml_node matrix = transform.append_child("Matrix");
 
-                yInfo() << "i" << i ;
-                yInfo() << "modulo " << i%4;
-                yInfo() << "j" << j ;
+                // TODO
+                Matrix R = axis2dcm(poses_layout[i].subVector(3,6));
+                Vector position = poses_layout[i].subVector(0,2);
+
+                pugi::xml_node row1 = matrix.append_child("row1");
+                row1.append_attribute("c1") = toStringPrecision(R(0,0),3).c_str();
+                row1.append_attribute("c2") = toStringPrecision(R(0,1),3).c_str();
+                row1.append_attribute("c3") = toStringPrecision(R(0,2),3).c_str();
+                row1.append_attribute("c4") = toStringPrecision(position(0),3).c_str();
+
+                pugi::xml_node row2= matrix.append_child("row2");
+                row2.append_attribute("c1") = toStringPrecision(R(1,0),3).c_str();
+                row2.append_attribute("c2") = toStringPrecision(R(1,1),3).c_str();
+                row2.append_attribute("c3") = toStringPrecision(R(1,2),3).c_str();
+                row2.append_attribute("c4") = toStringPrecision(position(1),3).c_str();
+
+                pugi::xml_node row3 = matrix.append_child("row3");
+                row3.append_attribute("c1") = toStringPrecision(R(2,0),3).c_str();
+                row3.append_attribute("c2") = toStringPrecision(R(2,1),3).c_str();
+                row3.append_attribute("c3") = toStringPrecision(R(2,2),3).c_str();
+                row3.append_attribute("c4") = toStringPrecision(position(2),3).c_str();
+
+                pugi::xml_node row4 = matrix.append_child("row4");
+                row4.append_attribute("c1") = 0;
+                row4.append_attribute("c2") = 0;
+                row4.append_attribute("c3") = 0;
+                row4.append_attribute("c4") = 1;
+
 
                 if (i > 0)
                 {
-                    if (i%4 == 0)
+                    if ((i+1)%4 == 0)
                         j++;
                 }
             }
@@ -306,6 +366,14 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             yError() << log_ID << "Not all the poses have been reached!";
             return false;
         }
+    }
+
+    /****************************************************************/
+    string toStringPrecision(double input,int n)
+    {
+        stringstream stream;
+        stream << fixed << setprecision(n) << input;
+        return stream.str();
     }
 
     /****************************************************************/
@@ -341,7 +409,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                             for (pugi::xml_attribute attr = row.first_attribute(); attr; attr = attr.next_attribute())
                             {
-                                transform(i,j)=attr.as_double();
+                                transform(i,j)=attr.as_double()/1000.0;
                                 j++;
                             }
 
@@ -372,17 +440,51 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "[ConvertPoses]";
 
-        Vector *marker_pose = port_marker_pose_in.read();
+        // TODO
+        //Vector *marker_pose = port_marker_pose_in.read();
+
+        // TODO Temporary for tests in simulation
+        Vector position(3);
+        position(0) = -0.15;
+        position(1) = 0.2;
+        position(2) = -0.15;
+
+        Vector orientation(4, 0.0);
+        orientation(2) = 1.0;
+        orientation(3) = 1.57;
+
+        Vector marker(7);
+        marker.resize(7,0.0);
+        marker.setSubvector(0,position);
+        marker.setSubvector(3,orientation);
+
+        Vector *marker_pose = &marker;
+        ///////
 
         if (marker_pose != NULL)
         {
             marker_pose_matrix.resize(4,4);
-            marker_pose_matrix.setSubcol(marker_pose->subVector(0,2), 0,3);
+            marker_pose_matrix.zero();
             marker_pose_matrix.setSubmatrix(axis2dcm(marker_pose->subVector(3,6)), 0, 0);
+            marker_pose_matrix.setSubcol(marker_pose->subVector(0,2), 0,3);
+            marker_pose_matrix(3,3) = 1.0;
 
             yInfo() << log_ID << "Received marker pose (Vector): " << marker_pose->toString();
             yInfo() << log_ID << "Received marker pose (Matrix): " << marker_pose_matrix.toString();
 
+            for (size_t i = 0 ; i < poses_layout.size() ; i++)
+            {
+                Vector position_omog(4,1.0);
+                position_omog.setSubvector(0,poses_layout[i].subVector(0,2));
+
+                Vector new_position = marker_pose_matrix * position_omog;
+
+                yDebug() << "Test " << poses_layout[i].subVector(0,2).toString();
+                yDebug() << "Test " << (marker_pose_matrix.submatrix(0,2,0,2) * poses_layout[i].subVector(0,2)).toString();
+
+                poses_layout[i].setSubvector(0, new_position);
+                poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));
+            }
 
             return true;
         }

@@ -35,13 +35,13 @@
 
  service ReachingTest_IDL
  {
-     bool execute_new_pose();
+     bool execute_new_pose(1: string &arm);
 
      Vector ask_new_pose();
 
      bool reset();
 
-     bool increas();
+     bool increase_pose();
 
      bool save_reached_poses();
 
