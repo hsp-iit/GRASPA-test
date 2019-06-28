@@ -34,6 +34,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     string reached_poses_file;
     string port_marker_pose_out;
     int pose_count;
+    string scene_name;
 
     // XML containing the poses for the reaching tests
     pugi::xml_document parsed_file;
@@ -273,7 +274,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             {
                 if (arm == "left")
                 {
-                    yInfo() << log_ID << "Going to position: " << poses_layout[pose_count].subVector(0,2).toString() << "with orientation: " << poses_layout[pose_count].subVector(3,6).toString();
+                    yInfo() << log_ID << "Going to pose No." << pose_count << " with position: " << poses_layout[pose_count].subVector(0,2).toString();
+                    yInfo() << log_ID << "                   and orientation: " << "and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
                     icart_left->waitMotionDone(0.4);
                     icart_left->getPose(reached_position, reached_orientation);
@@ -284,7 +286,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 }
                 else if (arm == "right")
                 {
-                    yInfo() << log_ID << "Going to position: " << poses_layout[pose_count].subVector(0,2).toString() << "with orientation: " << poses_layout[pose_count].subVector(3,6).toString();
+                    yInfo() << log_ID << "Going to pose No." << pose_count << " with position: " << poses_layout[pose_count].subVector(0,2).toString();
+                    yInfo() << log_ID << "                   and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
                     icart_right->waitMotionDone(0.4);
                     icart_right->getPose(reached_position, reached_orientation);
@@ -321,14 +324,16 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "save_reached_poses";
 
-        if (reached_poses.size() == poses_layout.size())
+        //if (reached_poses.size() == poses_layout.size())
+        if (1)
         {
             pugi::xml_document reched_poses_file;
             pugi::xml_node root = reched_poses_file.append_child("Scene");
+            root.append_attribute("name") = scene_name.c_str();
 
             int j = 0;
 
-            for (int i = 0; i< poses_layout.size(); i++)
+            for (int i = 0; i< reached_poses.size(); i++)
             {
                 string string_i = to_string(i%4);
                 string string_j = to_string(j);
@@ -345,32 +350,37 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 // TODO tO CHECK CORRECTNESS
                 Vector reached_pose_om(4,1.0);
                 reached_pose_om.setSubvector(0,reached_poses[i].subVector(0,2));
-                Vector position = (marker_pose_matrix.transposed() * reached_pose_om).subVector(0,2);
+
+                Vector position = (SE3inv(marker_pose_matrix) * reached_pose_om).subVector(0,2);
+
+                Matrix R_3x3 = R.submatrix(0,2,0,2);
+                Matrix marker_pose_3x3_inv = SE3inv(marker_pose_matrix).submatrix(0,2,0,2);
+
+                Matrix orientation_marker_frame = (marker_pose_3x3_inv * R_3x3);
 
                 pugi::xml_node row1 = matrix.append_child("row1");
-                row1.append_attribute("c1") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(0,0),3).c_str();
-                row1.append_attribute("c2") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(0,1),3).c_str();
-                row1.append_attribute("c3") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(0,2),3).c_str();
-                row1.append_attribute("c4") = toStringPrecision(position(0),3).c_str();
+                row1.append_attribute("c1") = toStringPrecision(orientation_marker_frame(0,0),3).c_str();
+                row1.append_attribute("c2") = toStringPrecision(orientation_marker_frame(0,1),3).c_str();
+                row1.append_attribute("c3") = toStringPrecision(orientation_marker_frame(0,2),3).c_str();
+                row1.append_attribute("c4") = toStringPrecision(position(0) * 1000,3).c_str();
 
                 pugi::xml_node row2= matrix.append_child("row2");
-                row2.append_attribute("c1") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(1,0),3).c_str();
-                row2.append_attribute("c2") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(1,1),3).c_str();
-                row2.append_attribute("c3") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(1,2),3).c_str();
-                row2.append_attribute("c4") = toStringPrecision(position(1),3).c_str();
+                row2.append_attribute("c1") = toStringPrecision(orientation_marker_frame(1,0),3).c_str();
+                row2.append_attribute("c2") = toStringPrecision(orientation_marker_frame(1,1),3).c_str();
+                row2.append_attribute("c3") = toStringPrecision(orientation_marker_frame(1,2),3).c_str();
+                row2.append_attribute("c4") = toStringPrecision(position(1) * 1000,3).c_str();
 
                 pugi::xml_node row3 = matrix.append_child("row3");
-                row3.append_attribute("c1") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(2,0),3).c_str();
-                row3.append_attribute("c2") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(2,1),3).c_str();
-                row3.append_attribute("c3") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(2,2),3).c_str();
-                row3.append_attribute("c4") = toStringPrecision(position(2),3).c_str();
+                row3.append_attribute("c1") = toStringPrecision(orientation_marker_frame(2,0),3).c_str();
+                row3.append_attribute("c2") = toStringPrecision(orientation_marker_frame(2,1),3).c_str();
+                row3.append_attribute("c3") = toStringPrecision(orientation_marker_frame(2,2),3).c_str();
+                row3.append_attribute("c4") = toStringPrecision(position(2) * 1000,3).c_str();
 
                 pugi::xml_node row4 = matrix.append_child("row4");
                 row4.append_attribute("c1") = 0;
                 row4.append_attribute("c2") = 0;
                 row4.append_attribute("c3") = 0;
                 row4.append_attribute("c4") = 1;
-
 
                 if (i > 0)
                 {
@@ -413,7 +423,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
         pugi::xml_node root = parsed_file.child("Scene");
 
-        string namePanel;
+        scene_name = root.first_attribute().as_string();
 
         for (pugi::xml_node panel = root.first_child(); panel; panel = panel.next_sibling())
         {
