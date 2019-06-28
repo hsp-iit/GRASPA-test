@@ -26,18 +26,23 @@
  *
  * IDL structure to set/show advanced parameters.
  */
- struct Bottle
+ struct Vector
  {
  } (
-    yarp.name = "yarp::os::Bottle"
-    yarp.includefile="yarp/os/Bottle.h"
+    yarp.name = "yarp::sig::Vector"
+    yarp.includefile="yarp/sig/Vector.h"
  )
 
  service ReachingTest_IDL
  {
      bool execute_new_pose();
 
-     Bottle ask_new_pose();
+     Vector ask_new_pose();
 
+     bool reset();
+
+     bool increas();
+
+     bool save_reached_poses();
 
  }
