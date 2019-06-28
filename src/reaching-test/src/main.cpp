@@ -259,10 +259,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 icart_left->waitMotionDone(0.4);
                 icart_left->getPose(reached_position, reached_orientation);
 
+                yInfo() << log_ID << "Going to home position";
                 icart_left->goToPoseSync(home_pos_left, home_orie_left);
                 icart_left->waitMotionDone(0.4);
-
-
             }
             else if (arm == "right")
             {
@@ -271,8 +270,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 icart_right->waitMotionDone(0.4);
                 icart_right->getPose(reached_position, reached_orientation);
 
-                icart_left->goToPoseSync(home_pos_right, home_orie_right);
-                icart_left->waitMotionDone(0.4);
+                yInfo() << log_ID << "Going to home position" << home_pos_right.toString() << home_orie_right.toString();
+                icart_right->goToPoseSync(home_pos_right, home_orie_right);
+                icart_right->waitMotionDone(0.4);
             }
 
             yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
@@ -299,8 +299,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "save_reached_poses";
 
-        //if (reached_poses.size() == poses_layout.size())
-        if (1)
+        if (reached_poses.size() == poses_layout.size())
         {
             pugi::xml_document reched_poses_file;
             pugi::xml_node root = reched_poses_file.append_child("Scene");
@@ -319,26 +318,29 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 pugi::xml_node transform = global_pose.append_child("Transform");
                 pugi::xml_node matrix = transform.append_child("Matrix");
 
-                // TODO
-                Matrix R = axis2dcm(poses_layout[i].subVector(3,6));
-                Vector position = poses_layout[i].subVector(0,2);
+                Matrix R = axis2dcm(reached_poses[i].subVector(3,6));
+
+                // TODO tO CHECK CORRECTNESS
+                Vector reached_pose_om(4,1.0);
+                reached_pose_om.setSubvector(0,reached_poses[i].subVector(0,2));
+                Vector position = (marker_pose_matrix.transposed() * reached_pose_om).subVector(0,2);
 
                 pugi::xml_node row1 = matrix.append_child("row1");
-                row1.append_attribute("c1") = toStringPrecision(R(0,0),3).c_str();
-                row1.append_attribute("c2") = toStringPrecision(R(0,1),3).c_str();
-                row1.append_attribute("c3") = toStringPrecision(R(0,2),3).c_str();
+                row1.append_attribute("c1") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(0,0),3).c_str();
+                row1.append_attribute("c2") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(0,1),3).c_str();
+                row1.append_attribute("c3") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(0,2),3).c_str();
                 row1.append_attribute("c4") = toStringPrecision(position(0),3).c_str();
 
                 pugi::xml_node row2= matrix.append_child("row2");
-                row2.append_attribute("c1") = toStringPrecision(R(1,0),3).c_str();
-                row2.append_attribute("c2") = toStringPrecision(R(1,1),3).c_str();
-                row2.append_attribute("c3") = toStringPrecision(R(1,2),3).c_str();
+                row2.append_attribute("c1") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(1,0),3).c_str();
+                row2.append_attribute("c2") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(1,1),3).c_str();
+                row2.append_attribute("c3") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(1,2),3).c_str();
                 row2.append_attribute("c4") = toStringPrecision(position(1),3).c_str();
 
                 pugi::xml_node row3 = matrix.append_child("row3");
-                row3.append_attribute("c1") = toStringPrecision(R(2,0),3).c_str();
-                row3.append_attribute("c2") = toStringPrecision(R(2,1),3).c_str();
-                row3.append_attribute("c3") = toStringPrecision(R(2,2),3).c_str();
+                row3.append_attribute("c1") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(2,0),3).c_str();
+                row3.append_attribute("c2") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(2,1),3).c_str();
+                row3.append_attribute("c3") = toStringPrecision((marker_pose_matrix.transposed().submatrix(0,2,0,2)*R)(2,2),3).c_str();
                 row3.append_attribute("c4") = toStringPrecision(position(2),3).c_str();
 
                 pugi::xml_node row4 = matrix.append_child("row4");
