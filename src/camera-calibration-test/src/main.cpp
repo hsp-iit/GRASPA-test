@@ -15,7 +15,10 @@
 #include <yarp/math/Math.h>
 
 #include <yarp/dev/CartesianControl.h>
+#include <yarp/dev/GazeControl.h>
 #include <yarp/dev/PolyDriver.h>
+
+#include <iCub/iKin/iKinFwd.h>
 
 #include <pugixml.hpp>
 
@@ -26,6 +29,7 @@ using namespace yarp::os;
 using namespace yarp::sig;
 using namespace yarp::dev;
 using namespace yarp::math;
+using namespace iCub::iKin;
 
 class ReachingTest : public RFModule, ReachingTest_IDL
 {
@@ -63,17 +67,24 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     PolyDriver left_arm_client, right_arm_client;
     ICartesianControl *icart_right, *icart_left;
 
-    // BufferedPort for reading aruko poses
-    BufferedPort<Vector> port_marker_pose_in;
+    // Devices
+    PolyDriver gaze_client;
+    IGazeControl *igaze;
+
+    // BufferedPort for reading aruko poses of base
+    BufferedPort<Vector> port_marker_pose_base_in;
+
+    // BufferedPort for reading aruko poses on the robot hand
+    BufferedPort<Vector> port_marker_pose_hand_in;
 
     /****************************************************************/
     bool configure(ResourceFinder &rf)
     {
-        port_prefix = "reaching-test";
+        port_prefix = "camera-calibration-test";
         string log_ID = "[Configure]";
 
         file_layout = rf.check("file-layout", Value("layout_0.xml")).asString();
-        reached_poses_file = rf.check("file-reached-poses", Value("test.xml")).asString();
+        reached_poses_file = rf.check("file-cam-calib-poses", Value("test.xml")).asString();
 
         // Read robot name
         if(!rf.check("robot"))
@@ -105,9 +116,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             {
                 if (!left_arm_client.open(optionLeftArm))
                 {
-                    if (left_arm_client.isValid())
+                    if (right_arm_client.isValid())
                     {
-                        left_arm_client.close();
+                        right_arm_client.close();
                     }
 
                     yError() << log_ID <<  "Could not open cartesian solver client for left arm";
@@ -149,9 +160,31 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     icart_right->setDOF(new_dof, dof);
                     icart_right->setInTargetTol(0.001);
                     icart_right->setLimits(0, 0.0, 15.0);
-
+                    
                     icart_right->getPose(home_pos_right, home_orie_right);
                 }
+            }
+
+            Property option;
+            option.put("device","gazecontrollerclient");
+            option.put("remote","/iKinGazeCtrl");
+            option.put("local","/" + port_prefix + "/gaze");
+
+            gaze_client.open(option);
+
+            igaze=NULL;
+            if (gaze_client.isValid())
+            {
+               gaze_client.view(igaze);
+
+               igaze->blockEyes(5.0);
+
+               igaze->blockNeckRoll(0.0);
+            }
+            else
+            {
+                yError() << log_ID << "No valid gaze controller!";
+                return false;
             }
         }
 
@@ -159,7 +192,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         user_rpc.open("/" + port_prefix + "/cmd:rpc");
 
         // Open port for aruko pose
-        port_marker_pose_in.open("/" + port_prefix + "/pose:in");
+        port_marker_pose_base_in.open("/" + port_prefix + "/pose_layout:in");
+
+        // Open port for aruko pose
+        port_marker_pose_hand_in.open("/" + port_prefix + "/pose_hand:in");
 
         //  attach callback
         attach(user_rpc);
@@ -211,6 +247,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         if (right_arm_client.isValid())
         {
             right_arm_client.close();
+        }
+        if (gaze_client.isValid())
+        {
+            gaze_client.close();
         }
 
         return true;
@@ -268,11 +308,15 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         Vector reached_position(3,0.0);
         Vector reached_orientation(4,0.0);
 
+        Vector pos_cart(3,0.0);
+        Vector orie_cart(4,0.0);
+
+        bool success = true;
+
         string log_ID = "[execute_new_pose]";
 
         if (pose_count < poses_layout.size())
         {
-
             if (arm == robot_arm || robot_arm == "both")
             {
                 if (arm == "left")
@@ -281,7 +325,13 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     yInfo() << log_ID << "                   and orientation: " << "and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
                     icart_left->waitMotionDone(0.4);
-                    icart_left->getPose(reached_position, reached_orientation);
+                    icart_left->getPose(pos_cart, orie_cart);
+
+                    if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart))
+                    {
+                        yError() << log_ID << "Problems in getting hand pose with marker!";
+                        success = false;
+                    }
 
                     yInfo() << log_ID << "Going to home position";
                     icart_left->goToPoseSync(home_pos_left, home_orie_left);
@@ -293,7 +343,13 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     yInfo() << log_ID << "                   and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
                     icart_right->waitMotionDone(0.4);
-                    icart_right->getPose(reached_position, reached_orientation);
+                    icart_right->getPose(pos_cart, orie_cart);
+
+                    if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart))
+                    {
+                        yError() << log_ID << "Problems in getting hand pose with marker!";
+                        success = false;
+                    }
 
                     yInfo() << log_ID << "Going to home position" << home_pos_right.toString() << home_orie_right.toString();
                     icart_right->goToPoseSync(home_pos_right, home_orie_right);
@@ -308,9 +364,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 reached_pose.setSubvector(3,reached_orientation);
                 reached_poses.push_back(reached_pose);
 
-                pose_count++;
+                if (success)
+                    pose_count++;
 
-                return true;
+                return success;
             }
             else
             {
@@ -320,6 +377,50 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         }
         else
             return false;
+    }
+
+    /****************************************************************/
+    bool getPoseFromMarker(Vector &pos, Vector &orie, const Vector &position_from_cartesian)
+    {
+        string log_ID = "[getPoseFromMarker]";
+
+        // Look hand with gazecontroller
+        igaze->lookAtFixationPointSync(position_from_cartesian);
+        igaze->waitMotionDone();
+
+        // Get position from aruko module TODO: Uncomment this on real robot
+        //Vector *hand_marker_pose = port_marker_pose_hand_in.read();
+
+        Vector hand_pose(7,0.0);
+        Vector *hand_marker_pose = &hand_pose;
+
+        if (hand_marker_pose != NULL)
+        {
+            pos = hand_marker_pose->subVector(3,6);
+            orie = hand_marker_pose->subVector(0,2);
+
+            yInfo() << log_ID << "Received marker pose (Position): " << pos.toString();
+            yInfo() << log_ID << "Received marker pose (Orientation): " << orie.toString();
+
+            // Look in front again
+            Vector in_front(3,0.0);
+            in_front(0) = -0.5;
+            in_front(2) = 0.35;
+            igaze->lookAtFixationPointSync(in_front);
+            igaze->waitMotionDone();
+
+            return true;
+        }
+        else
+        {
+            // Look in front again
+            Vector in_front(3,0.0);
+            in_front(0) = -0.5;
+            in_front(2) = 0.35;
+            igaze->lookAtFixationPointSync(in_front);
+            igaze->waitMotionDone();
+            return false;
+        }
     }
 
     /****************************************************************/

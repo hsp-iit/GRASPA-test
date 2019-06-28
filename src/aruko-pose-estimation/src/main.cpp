@@ -37,6 +37,8 @@ class ArukoPoseEstimation : public RFModule
     int marker_id;
     // Marker lenght of the layouts
     int marker_length;
+    // Aruko Dictionary
+    string dictionary_string;
 
     // Choose if to show image with the estimated pose
     bool send_image;
@@ -64,13 +66,14 @@ public:
     {
         // Basic sets
         string log_ID_ = "[Configure]";
-        port_prefix = "aruko-pose-estimation";
 
         // Read data from config.ini
         eye_name = rf.check("eye_name", Value("right")).asString();
         send_image = rf.check("send_image", Value("True")).asBool();
         marker_id = rf.check("marker_id", Value(107)).asInt();
-        marker_length = rf.check("marker_id", Value(0.05)).asDouble();;
+        marker_length = rf.check("marker_id", Value(0.05)).asDouble();
+        port_prefix = rf.check("port_prefix", Value("aruko-base-marker-estimation")).asDouble();
+        dictionary_string = rf.check("aruko_dictionary", Value("original")).asDouble();
 
         gaze = new::GazeController(port_prefix);
 
@@ -127,7 +130,10 @@ public:
         }
 
         // Configure a standard Aruco dictionary
-        dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
+        if (dictionary_string == "original")
+            dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
+        else if (dictionary_string == "4x4")
+            dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
     }
 
     /****************************************************************/
