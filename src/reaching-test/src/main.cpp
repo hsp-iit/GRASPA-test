@@ -327,11 +327,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "save_reached_poses";
 
-        //if (reached_poses.size() == poses_layout.size())
-        if (1)
+        if (reached_poses.size() == poses_layout.size())
         {
-            pugi::xml_document reched_poses_file;
-            pugi::xml_node root = reched_poses_file.append_child("Scene");
+            pugi::xml_document reached_poses_doc;
+            pugi::xml_node root = reached_poses_doc.append_child("Scene");
             root.append_attribute("name") = scene_name.c_str();
 
             int j = 0;
@@ -392,7 +391,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 }
             }
 
-            reched_poses_file.save_file(reached_poses_file.c_str());
+            reached_poses_doc.save_file(reached_poses_file.c_str());
 
             yInfo() << log_ID << "Poses saved in file: " << reached_poses_file;
 
