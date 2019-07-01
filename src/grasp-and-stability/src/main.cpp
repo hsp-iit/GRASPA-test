@@ -282,7 +282,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool get_grasp(const string &arm)
+    bool get_grasp(const string &arm, const string &object)
     {
         string log_ID = "[get_grasp]";
 
@@ -290,15 +290,23 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
         Bottle cmd, reply;
         cmd.addString("grasp_pose");
+        cmd.addString(object);
         cmd.addString(arm);
 
         grasp_pose_port.write(cmd, reply);
 
-        if (!reply.isNull())
+        // TODO Uncomment this when cardinal-points-grasp ready
+        //if (reply.size() > 0)
+        if (1)
         {
             // TODO Ask Fabrizio to add rpc command to get the compute poses
             // from cardinal point grasps
             grasp_pose.resize(7,0.0);
+
+            grasp_pose[0] = -0.4;
+            grasp_pose[1] = 0.0;
+            grasp_pose[2] = -0.10;
+            grasp_pose[5] = 1.0;
 
             trajectory.clear();
             trajectory.push_back(grasp_pose);
@@ -443,7 +451,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     bool execute_trajectory(const string &arm)
     {
         string log_ID = "[execute_trajectory]";
-        if (arm != robot_arm || robot_arm != "both")
+        if (arm != robot_arm && robot_arm != "both")
         {
             yError() << log_ID << "Not valid arm!";
             return false;
@@ -489,6 +497,14 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
+    bool home(const string &arm)
+    {
+        // TODO Open hand and go to home position
+        // Think how to do it
+        return true;
+    }
+
+    /****************************************************************/
     bool generateTrajectory()
     {
         string log_ID = "[generateTrajectory]";
@@ -497,12 +513,12 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         {
             Vector pose_0 = trajectory[0];
 
-            // Add waypoint 0
+            // Add waypoint 1
             Vector pose_tmp = pose_0;
             pose_tmp[2] += 0.15;
             trajectory.push_back(pose_tmp);
 
-            // Compute waypoint 1
+            // Compute waypoint 2
             Matrix pose_rotate_hf(3,3);
             // This is express in hand reference frame
             Vector aa_rotate_hf(4, 0.0);
@@ -518,16 +534,16 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // Rotation required in robot reference frame
             Matrix pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
 
-            // Add waypoint 1
-            pose_tmp = pose_0;
-            pose_tmp.setSubvector(0, dcm2axis(pose_rotate_rf));
-            trajectory.push_back(pose_tmp);
-
             // Add waypoint 2
-            pose_tmp = pose_0;
+            pose_tmp.setSubvector(3, dcm2axis(pose_rotate_rf));
             trajectory.push_back(pose_tmp);
 
-            // Compute waypoint 3
+            // Add waypoint 3
+            pose_tmp = pose_0;
+            pose_tmp[2] += 0.15;
+            trajectory.push_back(pose_tmp);
+
+            // Compute waypoint 4
             // This is express in hand reference frame
             aa_rotate_hf.resize(4, 0.0);
             aa_rotate_hf[0] = 1.0;
@@ -538,9 +554,8 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // Rotation required in robot reference frame
             pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
 
-            // Add waypoint 3
-            pose_tmp = pose_0;
-            pose_tmp.setSubvector(0, dcm2axis(pose_rotate_rf));
+            // Add waypoint 4
+            pose_tmp.setSubvector(3, dcm2axis(pose_rotate_rf));
             trajectory.push_back(pose_tmp);
 
             yInfo() << log_ID << "Generated trajectory";

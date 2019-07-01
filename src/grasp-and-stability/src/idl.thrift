@@ -35,7 +35,7 @@
 
  service GraspAndStability_IDL
  {
-     bool get_grasp(1: string &arm);
+     bool get_grasp(1: string &arm, 2: string &obj);
 
 	 bool grasp(1: string &arm, 2: string &obj);
 
@@ -44,5 +44,7 @@
      bool execute_trajectory(1: string &arm);
 
      bool set_layout_name(1: string &name);
+
+     bool home(1: string &arm);
 
  }
