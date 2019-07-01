@@ -308,9 +308,6 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             grasp_pose[2] = -0.10;
             grasp_pose[5] = 1.0;
 
-            trajectory.clear();
-            trajectory.push_back(grasp_pose);
-
             yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
 
             can_grasp = true;
@@ -508,17 +505,18 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     bool generateTrajectory()
     {
         string log_ID = "[generateTrajectory]";
+        trajectory.clear();
 
-        if (trajectory.size() == 1)
+        if (norm(grasp_pose.subVector(0,2)) > 0.0)
         {
-            Vector pose_0 = trajectory[0];
+            Vector pose_0 = grasp_pose;
 
-            // Add waypoint 1
+            // Add waypoint 0
             Vector pose_tmp = pose_0;
             pose_tmp[2] += 0.15;
             trajectory.push_back(pose_tmp);
 
-            // Compute waypoint 2
+            // Compute waypoint 1
             Matrix pose_rotate_hf(3,3);
             // This is express in hand reference frame
             Vector aa_rotate_hf(4, 0.0);
@@ -534,16 +532,16 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // Rotation required in robot reference frame
             Matrix pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
 
-            // Add waypoint 2
+            // Add waypoint 1
             pose_tmp.setSubvector(3, dcm2axis(pose_rotate_rf));
             trajectory.push_back(pose_tmp);
 
-            // Add waypoint 3
+            // Add waypoint 2
             pose_tmp = pose_0;
             pose_tmp[2] += 0.15;
             trajectory.push_back(pose_tmp);
 
-            // Compute waypoint 4
+            // Compute waypoint 3
             // This is express in hand reference frame
             aa_rotate_hf.resize(4, 0.0);
             aa_rotate_hf[0] = 1.0;
@@ -554,7 +552,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // Rotation required in robot reference frame
             pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
 
-            // Add waypoint 4
+            // Add waypoint 3
             pose_tmp.setSubvector(3, dcm2axis(pose_rotate_rf));
             trajectory.push_back(pose_tmp);
 
