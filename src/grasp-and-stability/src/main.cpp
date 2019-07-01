@@ -19,7 +19,7 @@
 
 #include <pugixml.hpp>
 
-#include "src/ReachingTest_IDL.h"
+#include "src/GraspAndStability_IDL.h"
 
 using namespace std;
 using namespace yarp::os;
@@ -31,6 +31,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 {
     string port_prefix;
     string moving_arm;
+    string object_name;
+    string output_path;
+    string layout_name;
     bool can_grasp;
 
     // Marker pose
@@ -38,6 +41,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
     // Grasp pose to test
     Vector grasp_pose;
+
+    // Grasp stability trajectory
+    vector<Vector> trajectory;
 
     // Port for thrift services
     RpcServer user_rpc;
@@ -76,6 +82,10 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             robot = rf.find("robot").asString();
         }
 
+        // Load data path where to save all files
+        output_path = rf.check("data-path", Value("grasps_data/")).toString();
+        // Load name of benchmark under test
+        layout_name = rf.check("layout-name", Value("Benchmark_Layout_0")).toString();
         // Read robot arm
         robot_arm = rf.check("robot-arm", Value("right")).toString();
 
@@ -147,6 +157,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         }
 
         can_grasp = false;
+        grasp_pose.resize(7, 0.0);
 
         // Open rpc port
         user_rpc.open("/" + port_prefix + "/cmd:rpc");
@@ -160,7 +171,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         //  attach callback
         attach(user_rpc);
 
-        marker_pose_received = getMarkerPose();
+        bool marker_pose_received = getMarkerPose();
 
         return marker_pose_received;
     }
@@ -168,7 +179,29 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     /****************************************************************/
     bool getMarkerPose()
     {
-        Vector *marker_pose = port_marker_pose_in.read();
+        string log_ID = "[getMarkerPose]";
+
+        // TODO Uncomment this to receive marker pose from port
+        //Vector *marker_pose = port_marker_pose_in.read();
+
+        // TODO Temporary for tests in simulation: Remove this once
+        // connected to the port
+        Vector position(3);
+        position(0) = -0.15;
+        position(1) = 0.2;
+        position(2) = -0.15;
+
+        Vector orientation(4, 0.0);
+        orientation(2) = 1.0;
+        orientation(3) = 1.57;
+
+        Vector marker(7);
+        marker.resize(7,0.0);
+        marker.setSubvector(0,position);
+        marker.setSubvector(3,orientation);
+
+        Vector *marker_pose = &marker;
+        ///////
 
         if (marker_pose != NULL)
         {
@@ -233,6 +266,22 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
+    bool set_layout_name(const string &name)
+    {
+        if (name == "Benchmark_Layout_0" || name == "Benchmark_Layout_1"
+            || name == "Benchmark_Layout_2")
+        {
+            layout_name = name;
+            return true;
+        }
+        else
+        {
+            yError() << "Unknown layout name!";
+            return false;
+        }
+    }
+
+    /****************************************************************/
     bool get_grasp(const string &arm)
     {
         string log_ID = "[get_grasp]";
@@ -245,13 +294,16 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
         grasp_pose_port.write(cmd, reply);
 
-        if (reply)
+        if (!reply.isNull())
         {
             // TODO Ask Fabrizio to add rpc command to get the compute poses
             // from cardinal point grasps
-            grasp.pose.resize(7,0.0);
+            grasp_pose.resize(7,0.0);
 
-            yInfo() << log_ID << "Received grasp pose " : grasp_pose.toString();
+            trajectory.clear();
+            trajectory.push_back(grasp_pose);
+
+            yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
 
             can_grasp = true;
             return true;
@@ -265,10 +317,11 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool grasp()
+    bool grasp(const string &arm, const string &obj)
     {
         string log_ID = "[grasp]";
-        
+        object_name = obj;
+
         if (can_grasp)
         {
             bool reached_pose;
@@ -281,6 +334,228 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         {
             yError() << log_ID << "Grasp cannot be executed because no new pose has been computed";
 
+            return false;
+        }
+    }
+
+    /****************************************************************/
+    bool save_grasp_data(const double graspable_value, const double grasped_value, const double grasp_stability_value)
+    {
+        string log_ID = "acquire_grasp_data";
+
+        // Fill file according to Simox convetion
+        pugi::xml_document grasps_file;
+        pugi::xml_node root = grasps_file.append_child("ManipulationObject");
+        root.append_attribute("name") = object_name.c_str();
+
+        pugi::xml_node visualization = root.append_child("Visualization");
+        pugi::xml_node file_vis = visualization.append_child("File");
+        file_vis.append_attribute("type") = "inventor";
+        string model_path = "../../../RAL-benchmark-code/data/objects/YCB/" + object_name +"/./nontextured.stl";
+        file_vis.text().set(model_path.c_str());
+
+
+        pugi::xml_node collision = root.append_child("CollissionModel");
+        pugi::xml_node file_collision = collision.append_child("File");
+        file_collision.append_attribute("type") = "inventor";
+        file_collision.text().set(model_path.c_str());
+
+        pugi::xml_node grasps = root.append_child("GraspSet");
+        grasps.append_attribute("name") =  layout_name.c_str();
+        grasps.append_attribute("RobotType") =  "iCub";
+        if (robot_arm == "left")
+            grasps.append_attribute("EndEffector") =  "Left Hand";
+        else
+            grasps.append_attribute("EndEffector") =  "Right Hand";
+
+        pugi::xml_node single_grasp = grasps.append_child("Grasp");
+        single_grasp.append_attribute("name") = "Grasp 1";
+        single_grasp.append_attribute("quality") = 0.0;  // TODO This will be computed by the script
+        single_grasp.append_attribute("Creation") = "Simox - GraspStudio - GraspWrenchSpace";
+        single_grasp.append_attribute("Preshape") = "Grasp Preshape";
+
+        pugi::xml_node pose = single_grasp.append_child("Transform");
+        pugi::xml_node matrix = pose.append_child("Matrix4x4");
+
+        // TODO tO CHECK CORRECTNESS
+        Vector grasp_pose_om(4,1.0);
+        grasp_pose_om.setSubvector(0,grasp_pose.subVector(0,2));
+
+        Vector position = (SE3inv(marker_pose_matrix) * grasp_pose_om).subVector(0,2);
+
+        Matrix R_3x3 = axis2dcm(grasp_pose.subVector(3,6)).submatrix(0,2,0,2);
+        Matrix marker_pose_3x3_inv = SE3inv(marker_pose_matrix).submatrix(0,2,0,2);
+
+        Matrix orientation_marker_frame = (marker_pose_3x3_inv * R_3x3);
+
+        pugi::xml_node row1 = matrix.append_child("row1");
+        row1.append_attribute("c1") = toStringPrecision(orientation_marker_frame(0,0),3).c_str();
+        row1.append_attribute("c2") = toStringPrecision(orientation_marker_frame(0,1),3).c_str();
+        row1.append_attribute("c3") = toStringPrecision(orientation_marker_frame(0,2),3).c_str();
+        row1.append_attribute("c4") = toStringPrecision(position(0) * 1000,3).c_str();
+
+        pugi::xml_node row2= matrix.append_child("row2");
+        row2.append_attribute("c1") = toStringPrecision(orientation_marker_frame(1,0),3).c_str();
+        row2.append_attribute("c2") = toStringPrecision(orientation_marker_frame(1,1),3).c_str();
+        row2.append_attribute("c3") = toStringPrecision(orientation_marker_frame(1,2),3).c_str();
+        row2.append_attribute("c4") = toStringPrecision(position(1) * 1000,3).c_str();
+
+        pugi::xml_node row3 = matrix.append_child("row3");
+        row3.append_attribute("c1") = toStringPrecision(orientation_marker_frame(2,0),3).c_str();
+        row3.append_attribute("c2") = toStringPrecision(orientation_marker_frame(2,1),3).c_str();
+        row3.append_attribute("c3") = toStringPrecision(orientation_marker_frame(2,2),3).c_str();
+        row3.append_attribute("c4") = toStringPrecision(position(2) * 1000,3).c_str();
+
+        pugi::xml_node row4 = matrix.append_child("row4");
+        row4.append_attribute("c1") = 0;
+        row4.append_attribute("c2") = 0;
+        row4.append_attribute("c3") = 0;
+        row4.append_attribute("c4") = 1;
+
+        pugi::xml_node graspable = root.append_child("Graspable");
+        graspable.append_attribute("quality") = graspable_value;
+
+        pugi::xml_node grasped = root.append_child("Grasped");
+        grasped.append_attribute("quality") = grasped_value;
+
+        pugi::xml_node grasp_stability = root.append_child("GraspStability");
+        grasp_stability.append_attribute("quality") = grasp_stability_value;
+
+        string complete_path_file = "ycb_" + object_name + "_grasp.xml";
+        grasps_file.save_file(complete_path_file.c_str());
+        // TODO Use this if xml declaration in file is a problem
+        //grasps_file.save_file(complete_path_file.c_str(),"\t", pugi::format_no_declaration);
+
+        yInfo() << log_ID << "Grasps data saved in file " << "ycb_" + object_name + "_grasp.xml";
+
+        return true;
+    }
+
+    /****************************************************************/
+    string toStringPrecision(double input,int n)
+    {
+        stringstream stream;
+        stream << fixed << setprecision(n) << input;
+        return stream.str();
+    }
+
+    /****************************************************************/
+    bool execute_trajectory(const string &arm)
+    {
+        string log_ID = "[execute_trajectory]";
+        if (arm != robot_arm || robot_arm != "both")
+        {
+            yError() << log_ID << "Not valid arm!";
+            return false;
+        }
+
+        if (!generateTrajectory())
+            return false;
+        else
+        {
+            int count = 0;
+
+            for (auto t : trajectory)
+            {
+                if (arm == "left")
+                {
+                    yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
+                    yInfo() << log_ID << "                   and orientation: " << "and orientation: " << t.subVector(3,6).toString();
+                    icart_left->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
+                    icart_left->waitMotionDone(0.4);
+                    //icart_left->getPose(reached_position, reached_orientation);
+                }
+                else if (arm == "right")
+                {
+                    yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
+                    yInfo() << log_ID << "                   and orientation: " << t.subVector(3,6).toString();
+                    icart_right->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
+                    icart_right->waitMotionDone(0.4);
+                    //icart_right->getPose(reached_position, reached_orientation);
+                }
+
+                //yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
+
+                // Vector reached_pose(7,0.0);
+                //
+                // reached_pose.setSubvector(0, reached_position);
+                // reached_pose.setSubvector(3,reached_orientation);
+                // reached_poses.push_back(reached_pose);
+
+                count ++;
+            }
+            return true;
+        }
+    }
+
+    /****************************************************************/
+    bool generateTrajectory()
+    {
+        string log_ID = "[generateTrajectory]";
+
+        if (trajectory.size() == 1)
+        {
+            Vector pose_0 = trajectory[0];
+
+            // Add waypoint 0
+            Vector pose_tmp = pose_0;
+            pose_tmp[2] += 0.15;
+            trajectory.push_back(pose_tmp);
+
+            // Compute waypoint 1
+            Matrix pose_rotate_hf(3,3);
+            // This is express in hand reference frame
+            Vector aa_rotate_hf(4, 0.0);
+            aa_rotate_hf[0] = 1.0;
+            aa_rotate_hf[3] = M_PI/4,0;
+
+            pose_rotate_hf = axis2dcm(aa_rotate_hf).submatrix(0,2,0,2);
+
+            // Hand pose in robot frame
+            Matrix pose_hand_rf(3,3);
+            pose_hand_rf = axis2dcm(pose_0.subVector(3,6)).submatrix(0,2,0,2);
+
+            // Rotation required in robot reference frame
+            Matrix pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
+
+            // Add waypoint 1
+            pose_tmp = pose_0;
+            pose_tmp.setSubvector(0, dcm2axis(pose_rotate_rf));
+            trajectory.push_back(pose_tmp);
+
+            // Add waypoint 2
+            pose_tmp = pose_0;
+            trajectory.push_back(pose_tmp);
+
+            // Compute waypoint 3
+            // This is express in hand reference frame
+            aa_rotate_hf.resize(4, 0.0);
+            aa_rotate_hf[0] = 1.0;
+            aa_rotate_hf[3] = -M_PI/4,0;
+
+            pose_rotate_hf = axis2dcm(aa_rotate_hf).submatrix(0,2,0,2);
+
+            // Rotation required in robot reference frame
+            pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
+
+            // Add waypoint 3
+            pose_tmp = pose_0;
+            pose_tmp.setSubvector(0, dcm2axis(pose_rotate_rf));
+            trajectory.push_back(pose_tmp);
+
+            yInfo() << log_ID << "Generated trajectory";
+            int count = 0;
+            for (auto p : trajectory)
+            {
+                yInfo() << log_ID << "No. " << count << " : " << p.toString();
+                count++;
+            }
+
+            return true;
+        }
+        else
+        {
+            yError() << log_ID << "Error in trajectory size: " << trajectory.size();
             return false;
         }
     }
@@ -307,7 +582,7 @@ int main(int argc, char** argv)
     rf.setDefaultConfigFile("config.ini");
     rf.configure(argc, argv);
 
-    GRaspAndStability module;
+    GraspAndStability module;
 
     return module.runModule(rf);
 }

@@ -9,17 +9,22 @@
 
 add_subdirectory(gaze-ctrl-lib)
 
-option(BUILD_ARUKO_POSE_ESTIMATION "Build aruko-pose-estimation" OFF)
+option(BUILD_ARUKO_POSE_ESTIMATION "Build aruko-pose-estimation" ON)
 if (BUILD_ARUKO_POSE_ESTIMATION)
   add_subdirectory(aruko-pose-estimation)
 endif()
 
-option(BUILD_CAMERA_CALIBRATION_TEST "Build camera-calibration-test" OFF)
+option(BUILD_CAMERA_CALIBRATION_TEST "Build camera-calibration-test" ON)
 if (BUILD_CAMERA_CALIBRATION_TEST)
   add_subdirectory(camera-calibration-test)
 endif()
 
-option(BUILD_REACHING_TEST "Build reaching-test" OFF)
+option(BUILD_REACHING_TEST "Build reaching-test" ON)
 if (BUILD_REACHING_TEST)
   add_subdirectory(reaching-test)
+endif()
+
+option(BUILD_GRASP_AND_STABILITY "Build grasp-and-stability" ON)
+if (BUILD_GRASP_AND_STABILITY)
+  add_subdirectory(grasp-and-stability)
 endif()
