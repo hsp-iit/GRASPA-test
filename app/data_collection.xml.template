@@ -1,95 +1,127 @@
 <application>
-  <name>RAL Grasping Benchmark - Data Collection</name>
-  <module>
+    <name>RAL Grasping Benchmark - Data Collection</name>
+    <module>
     <name>aruko-pose-estimation</name>
-    <parameters>--from config_base.ini</parameters>
-    <node>localhost</node>
-  </module>
-  <module>
-    <name>aruko-pose-estimation</name>
-    <parameters>--from config_hand.ini</parameters>
-    <node>localhost</node>
-  </module>
-  <module>
-    <name>reaching-test</name>
-    <parameters> --from config.ini </parameters>
-    <node>localhost</node>
-  </module>
-  <module>
-    <name>camera-calibration-test</name>
-    <parameters> --from config.ini </parameters>
-    <node>localhost</node>
-  </module>
-  <module>
-    <name>grasp-and-stability</name>
-    <parameters> --from config.ini </parameters>
-    <node>localhost</node>
-  </module>
-  <module>
-    <name>actionsRenderingEngine</name>
-    <parameters> --block_eyes 5.0 </parameters>
-    <node>localhost</node>
-  </module>
-  <module>
-   <name>yarpview</name>
-   <parameters>--name viewer/left/marker_pose:i</parameters>
-   <node>localhost</node>
-   <prefix></prefix>
+        <parameters>--from config_base.ini</parameters>
+        <node>localhost</node>
     </module>
     <module>
-       <name>yarpview</name>
-       <parameters>--name viewer/right/marker_pose:i</parameters>
-       <node>localhost</node>
-       <prefix></prefix>
+        <name>aruko-pose-estimation</name>
+        <parameters>--from config_hand.ini</parameters>
+        <node>localhost</node>
     </module>
-  <connection>
-    <from>/aruko-marker-pose/marker-estimate/estimate:o</from>
-    <to>/reaching-test/pose:in</to>
-    <protocol>fast_tcp</protocol>
-  </connection>
-  <connection>
-    <from>/aruko-marker-pose/marker-estimate/estimate:o</from>
-    <to>/camera-calibration-test/pose_layout:in</to>
-    <protocol>fast_tcp</protocol>
-  </connection>
-  <connection>
-    <from>/hand-pose-estimation/marker-estimate/estimate:o</from>
-    <to>/camera-calibration-test/pose_hand:in</to>
-    <protocol>fast_tcp</protocol>
-  </connection>
-  <connection>
-    <from>/icub/camcalib/right/out</from>
-    <to>/aruko-marker-pose/cam/right:i</to>
-    <protocol>mjpeg</protocol>
-  </connection>
-  <connection>
-    <from>/icub/camcalib/left/out</from>
-    <to>/aruko-marker-pose/cam/left:i</to>
-    <protocol>mjpeg</protocol>
-  </connection>
-  <connection>
-    <from>/aruko-marker-pose/cam/right:o</from>
-    <to>/viewer/right/marker_pose:i</to>
-    <protocol>mjpeg</protocol>
-  </connection>
-  <connection>
-    <from>/aruko-marker-pose/cam/left:o</from>
-    <to>/viewer/left/marker_pose:i</to>
-    <protocol>mjpeg</protocol>
-  </connection>
-  <connection>
-    <from>/aruko-marker-pose/marker-estimate/estimate:o</from>
-    <to>/grasp-and-stability/pose:in</to>
-    <protocol>fast_tcp</protocol>
-  </connection>
-  <connection>
-    <from>/grasp-and-stability/grasp_pose:rpc</from>
-    <to>/graspProcessor/cmd:rpc</to>
-    <protocol>fast_tcp</protocol>
-  </connection>
-  <connection>
-    <from>/grasp-and-stability/are:rpc</from>
-    <to>/actionsRenderingEngine/cmd:io</to>
-    <protocol>fast_tcp</protocol>
-  </connection>
+    <module>
+        <name>reaching-test</name>
+        <parameters> --from config.ini </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>camera-calibration-test</name>
+        <parameters> --from config.ini </parameters>
+        <node>localhost</node>
+    </module>
+        <module>
+        <name>grasp-and-stability</name>
+        <parameters> --from config.ini </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>actionsRenderingEngine</name>
+        <parameters> --block_eyes 5.0 --go_up 0.15 </parameters>
+        <node>localhost</node>
+    </module>
+    <module>
+        <name>yarpview</name>
+        <parameters>--name viewer/left/marker_pose:i</parameters>
+        <node>localhost</node>
+        <prefix></prefix>
+    </module>
+    <module>
+        <name>yarpview</name>
+        <parameters>--name viewer/right/marker_pose:i</parameters>
+        <node>localhost</node>
+        <prefix></prefix>
+    </module>
+    <module>
+        <name>yarpview</name>
+        <parameters>--name viewer/right/hand_pose:i</parameters>
+        <node>localhost</node>
+        <prefix></prefix>
+    </module>
+    <module>
+        <name>yarpview</name>
+        <parameters>--name viewer/left/hand_pose:i</parameters>
+        <node>localhost</node>
+        <prefix></prefix>
+    </module>
+    <connection>
+        <from>/aruko-base-marker-estimation/marker-estimate/estimate:o</from>
+        <to>/reaching-test/pose:in</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    <connection>
+        <from>/aruko-base-marker-estimation/marker-estimate/estimate:o</from>
+        <to>/camera-calibration-test/pose_layout:in</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    <connection>
+        <from>/hand-pose-estimation/marker-estimate/estimate:o</from>
+        <to>/camera-calibration-test/pose_hand:in</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/aruko-base-marker-estimation/cam/right:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/aruko-base-marker-estimation/cam/left:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/aruko-base-marker-estimation/cam/right:o</from>
+        <to>/viewer/right/marker_pose:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/aruko-base-marker-estimation/cam/left:o</from>
+        <to>/viewer/left/marker_pose:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/icub/camcalib/right/out</from>
+        <to>/hand-pose-estimation/cam/right:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/icub/camcalib/left/out</from>
+        <to>/hand-pose-estimation/cam/left:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/hand-pose-estimation/cam/right:o</from>
+        <to>/viewer/right/hand_pose:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/hand-pose-estimation/cam/left:o</from>
+        <to>/viewer/left/hand_pose:i</to>
+        <protocol>mjpeg</protocol>
+    </connection>
+    <connection>
+        <from>/aruko-base-marker-estimation/marker-estimate/estimate:o</from>
+        <to>/grasp-and-stability/pose:in</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    <connection>
+        <from>/grasp-and-stability/grasp_pose:rpc</from>
+        <to>/graspProcessor/cmd:rpc</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    <connection>
+        <from>/grasp-and-stability/are:rpc</from>
+        <to>/actionsRenderingEngine/cmd:io</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
 </application>

@@ -378,6 +378,10 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             ptr.addDouble(grasp_pose(5));
             ptr.addDouble(grasp_pose(6));
 
+            // TODO Check if this is correct
+            // This is for not make the robot goes back to home
+            command.addString("still");
+
             Bottle &ptr1 = command.addList();
             ptr1.addString("approach");
             Bottle &ptr2 = ptr1.addList();
