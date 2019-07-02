@@ -85,14 +85,14 @@ public:
         }
 
         // Open camera  output port
-        if(!port_image_out.open("/" + port_prefix + "/cam/" + eye_name + ":i"))
+        if(!port_image_out.open("/" + port_prefix + "/cam/" + eye_name + ":o"))
         {
             std::string err = log_ID_ + "::CTOR::ERROR\n\tError: cannot open " + eye_name + " camera input port.";
             return false;
         }
 
         // Open aruco pose output port
-        if(!port_aruco_pose_out.open("/" + port_prefix + "/marker-estimate/" + eye_name + "/estimate:o"))
+        if(!port_aruco_pose_out.open("/" + port_prefix + "/marker-estimate/estimate:o"))
         {
             std::string err = log_ID_ + "::CTOR::ERROR\n\tError: cannot open marker estimate output port.";
             return false;

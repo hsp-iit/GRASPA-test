@@ -51,6 +51,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     // Port to ask for grasp pose
     RpcClient grasp_pose_port;
 
+    // Port to communicare with ARE
+    RpcClient action_render_rpc;
+
     // Robot params
     string robot;
     string robot_arm;
@@ -58,6 +61,10 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     // Home positions
     Vector home_pos_left, home_orie_left;
     Vector home_pos_right, home_orie_right;
+
+    // Approach pose
+    Vector grasper_approach_parameters_left;
+    Vector grasper_approach_parameters_right;
 
     // Devices
     PolyDriver left_arm_client, right_arm_client;
@@ -156,11 +163,27 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             }
         }
 
+        // Set parameters for approaching phase during grasp
+        grasper_approach_parameters_right.resize(4,0.0);
+        grasper_approach_parameters_right[0] = -0.05;
+        grasper_approach_parameters_right[1] = 0.0;
+        grasper_approach_parameters_right[2] = -0.05;
+        grasper_approach_parameters_right[3] = 0.0;
+
+        grasper_approach_parameters_left.resize(4,0.0);
+        grasper_approach_parameters_left[0] = -0.05;
+        grasper_approach_parameters_left[1] = 0.0;
+        grasper_approach_parameters_left[2] = +0.05;
+        grasper_approach_parameters_left[3] = 0.0;
+
         can_grasp = false;
         grasp_pose.resize(7, 0.0);
 
         // Open rpc port
         user_rpc.open("/" + port_prefix + "/cmd:rpc");
+
+        // Open port for aruko pose
+        action_render_rpc.open("/" + port_prefix + "/are:rpc");
 
         // Open port for aruko pose
         grasp_pose_port.open("/" + port_prefix + "/grasp_pose:rpc");
@@ -245,6 +268,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     bool interruptModule()
     {
         user_rpc.interrupt();
+        action_render_rpc.interrupt();
+        grasp_pose_port.interrupt();
+
         return true;
     }
 
@@ -252,6 +278,8 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     bool close()
     {
         user_rpc.close();
+        action_render_rpc.close();
+        grasp_pose_port.close();
 
         if (left_arm_client.isValid())
         {
@@ -303,10 +331,13 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // from cardinal point grasps
             grasp_pose.resize(7,0.0);
 
+            // TODO Remove this to go on the real robot
             grasp_pose[0] = -0.4;
             grasp_pose[1] = 0.0;
             grasp_pose[2] = -0.10;
             grasp_pose[5] = 1.0;
+            /////////
+
 
             yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
 
@@ -330,10 +361,59 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         if (can_grasp)
         {
             bool reached_pose;
+            //  Communication with actionRenderingEngine/cmd:io
+            //  grasp("cartesian" x y z gx gy gz theta) ("approach" (-0.05 0 +-0.05 0.0)) "left"/"right"
+            Bottle command, reply;
 
-            // TODO Make grasp the object (reach and close hand)
-            can_grasp = false;
-            return reached_pose;
+            // TODO Ask ARE to provide another service just to reach and grasp
+            // without lifting the object
+            command.addString("grasp");
+            Bottle &ptr = command.addList();
+            ptr.addString("cartesian");
+            ptr.addDouble(grasp_pose(0));
+            ptr.addDouble(grasp_pose(1));
+            ptr.addDouble(grasp_pose(2));
+            ptr.addDouble(grasp_pose(3));
+            ptr.addDouble(grasp_pose(4));
+            ptr.addDouble(grasp_pose(5));
+            ptr.addDouble(grasp_pose(6));
+
+            Bottle &ptr1 = command.addList();
+            ptr1.addString("approach");
+            Bottle &ptr2 = ptr1.addList();
+            if (arm == robot_arm || robot_arm == "both")
+            {
+                if (arm == "left")
+                {
+                    for(int i=0 ; i<4 ; i++) ptr2.addDouble(grasper_approach_parameters_left[i]);
+                    command.addString("left");
+                }
+                else
+                {
+                    for(int i=0 ; i<4 ; i++) ptr2.addDouble(grasper_approach_parameters_right[i]);
+                    command.addString("right");
+                }
+
+                yInfo() << command.toString();
+                action_render_rpc.write(command, reply);
+                if (reply.toString() == "[ack]")
+                {
+                    reached_pose = true;
+                }
+                else
+                {
+                    yError() << log_ID << "Problems in grasping the object!";
+                    reached_pose = false;
+                }
+
+                can_grasp = false;
+                return reached_pose;
+            }
+            else
+            {
+                yError() << log_ID << "Arm not valid!";
+                return false;
+            }
         }
         else
         {
