@@ -44,7 +44,9 @@ target_link_libraries(${EXE_TARGET_NAME} PRIVATE
                                          ${OpenCV_LIBS}
                                          )
 
-set(${EXE_TARGET_NAME}_CONF ${CMAKE_CURRENT_SOURCE_DIR}/conf/config.ini
+set(${EXE_TARGET_NAME}_CONF ${CMAKE_CURRENT_SOURCE_DIR}/conf/config_base.ini
+                            ${CMAKE_CURRENT_SOURCE_DIR}/conf/config_hand.ini
+                            ${CMAKE_CURRENT_SOURCE_DIR}/conf/sfm_config.ini
                             ${CMAKE_CURRENT_SOURCE_DIR}/conf/opencv_icub_intrinsics_left
                             ${CMAKE_CURRENT_SOURCE_DIR}/conf/opencv_icub_intrinsics_right
                             )

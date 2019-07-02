@@ -44,6 +44,6 @@ target_link_libraries(${EXE_TARGET_NAME} PRIVATE
                              )
 
 
- yarp_install(FILES ${${EXE_TARGET_NAME}_CONF} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/aruko-pose-estimation)
+ yarp_install(FILES ${${EXE_TARGET_NAME}_CONF} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/grasp-and-stability)
 
  install(TARGETS ${EXE_TARGET_NAME} DESTINATION bin)

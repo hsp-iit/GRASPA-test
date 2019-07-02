@@ -38,4 +38,7 @@ include(ICUBcontribOptions)
 icubcontrib_set_default_prefix()
 icubcontrib_add_uninstall_target()
 
+file(GLOB scripts ${CMAKE_SOURCE_DIR}/app/*.template)
+yarp_install(FILES ${scripts} DESTINATION ${ICUBCONTRIB_APPLICATIONS_TEMPLATES_INSTALL_DIR})
+
 add_subdirectory(src)

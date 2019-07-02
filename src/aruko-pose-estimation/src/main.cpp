@@ -315,7 +315,7 @@ int main(int argc, char** argv)
 
     ResourceFinder rf;
     rf.setDefaultContext("aruko-pose-estimation");
-    rf.setDefaultConfigFile("config.ini");
+    rf.setDefaultConfigFile("config_base.ini");
     rf.configure(argc, argv);
 
     ArukoPoseEstimation module;

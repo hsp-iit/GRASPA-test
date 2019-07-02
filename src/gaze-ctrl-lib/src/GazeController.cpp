@@ -84,10 +84,10 @@ GazeController::GazeController(const std::string port_prefix)
         icub_kin_eye_right_.releaseLink(2);
 
         // Also load instrinsic parameters from configuration file
-        // installed by the package 'object-tracking'
+        // installed by the package 'gaze-ctrl-lib'
         ResourceFinder rf;
         rf.setVerbose(true);
-        rf.setDefaultContext("object-tracking");
+        rf.setDefaultContext("aruko-pose-estimation");
         rf.setDefaultConfigFile("sfm_config.ini");
         rf.configure(0, nullptr);
 

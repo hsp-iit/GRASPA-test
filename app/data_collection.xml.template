@@ -2,11 +2,12 @@
   <name>RAL Grasping Benchmark - Data Collection</name>
   <module>
     <name>aruko-pose-estimation</name>
+    <parameters>--from config_base.ini</parameters>
     <node>localhost</node>
   </module>
   <module>
     <name>aruko-pose-estimation</name>
-    <parameters>--port_prefix hand-pose-estimation</parameters>
+    <parameters>--from config_hand.ini</parameters>
     <node>localhost</node>
   </module>
   <module>
