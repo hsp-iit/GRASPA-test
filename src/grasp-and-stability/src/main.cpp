@@ -317,7 +317,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         moving_arm = arm;
 
         Bottle cmd, reply;
-        cmd.addString("grasp_pose");
+        cmd.addString("get_grasp_pose");
         cmd.addString(object);
         cmd.addString(arm);
 
@@ -338,6 +338,12 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             grasp_pose[5] = 1.0;
             /////////
 
+            Bottle *list_values = reply.get(0).asList();
+
+            for (size_t i = 0; i < list_values->size(); i++)
+            {
+                grasp_pose[i] = list_values->get(i).asDouble();
+            }
 
             yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
 
