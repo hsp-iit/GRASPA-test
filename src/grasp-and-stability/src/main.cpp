@@ -9,6 +9,7 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <map>
 
 #include <yarp/os/all.h>
 #include <yarp/sig/all.h>
@@ -35,6 +36,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     string output_path;
     string layout_name;
     bool can_grasp;
+
+    // Map of objects names
+    std::map<string, string> maps_object_name;
 
     // Marker pose
     Matrix marker_pose_matrix;
@@ -74,10 +78,33 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     BufferedPort<Vector> port_marker_pose_in;
 
     /****************************************************************/
+    void fillMapsObjNames()
+    {
+        maps_object_name["banana"] = "Banana";
+        maps_object_name["chips_can"] = "ChipsCan";
+        maps_object_name["cracker_box"] = "CrackerBox";
+        maps_object_name["foam_brick"] = "FoamBrick";
+        maps_object_name["gelatin_box"] = "GelatinBox";
+        maps_object_name["hammer"] = "Hammer";
+        maps_object_name["master_chef_can"] = "MasterChefCan";
+        maps_object_name["medium_clamp"] = "MediumClamp";
+        maps_object_name["mustard_bottle"] = "MustardBottle";
+        maps_object_name["pear"] = "Pear";
+        maps_object_name["potted_meat_can"] = "PottedMeatCan";
+        maps_object_name["power_drill"] = "PowerDrill";
+        maps_object_name["scissors"] = "Scissors";
+        maps_object_name["strawberry"] = "Strawberry";
+        maps_object_name["tennis_ball"] = "TennisBall";
+        maps_object_name["tomato_soup_can"] = "TomatoSoupCan";
+    }
+
+    /****************************************************************/
     bool configure(ResourceFinder &rf)
     {
         port_prefix = "grasp-and-stability";
         string log_ID = "[Configure]";
+
+        fillMapsObjNames();
 
         // Read robot name
         if(!rf.check("robot"))
@@ -508,12 +535,12 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         pugi::xml_node grasp_stability = root.append_child("GraspStability");
         grasp_stability.append_attribute("quality") = grasp_stability_value;
 
-        string complete_path_file = "ycb_" + object_name + "_grasp.xml";
+        string complete_path_file = "Ycb" + maps_object_name[object_name] + "_grasp.xml";
         grasps_file.save_file(complete_path_file.c_str());
         // TODO Use this if xml declaration in file is a problem
         //grasps_file.save_file(complete_path_file.c_str(),"\t", pugi::format_no_declaration);
 
-        yInfo() << log_ID << "Grasps data saved in file " << "ycb_" + object_name + "_grasp.xml";
+        yInfo() << log_ID << "Grasps data saved in file " << "Ycb" + maps_object_name[object_name.c_str()] + "_grasp.xml";
 
         return true;
     }
