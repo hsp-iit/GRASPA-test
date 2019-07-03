@@ -348,10 +348,11 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 pugi::xml_node transform = global_pose.append_child("Transform");
                 pugi::xml_node matrix = transform.append_child("Matrix");
 
-                Matrix R = axis2dcm(reached_poses[i].subVector(3,6));
-
                 // TODO tO CHECK CORRECTNESS
                 Vector reached_pose_om(4,1.0);
+
+                Matrix R = axis2dcm(reached_poses[i].subVector(3,6));
+
                 reached_pose_om.setSubvector(0,reached_poses[i].subVector(0,2));
 
                 Vector position = (SE3inv(marker_pose_matrix) * reached_pose_om).subVector(0,2);

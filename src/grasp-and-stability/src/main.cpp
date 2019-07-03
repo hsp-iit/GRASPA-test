@@ -179,6 +179,8 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         can_grasp = false;
         grasp_pose.resize(7, 0.0);
 
+        moving_arm = "none";
+
         // Open rpc port
         user_rpc.open("/" + port_prefix + "/cmd:rpc");
 
@@ -315,29 +317,18 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         string log_ID = "[get_grasp]";
 
         moving_arm = arm;
+        object_name = object;
 
         Bottle cmd, reply;
         cmd.addString("get_grasp_pose");
-        cmd.addString(object);
-        cmd.addString(arm);
+        cmd.addString(object_name);
+        cmd.addString(moving_arm);
 
         grasp_pose_port.write(cmd, reply);
 
-        // TODO Uncomment this when cardinal-points-grasp ready
-        //if (reply.size() > 0)
-        if (1)
+        if (reply.size() > 0)
         {
-            // TODO Ask Fabrizio to add rpc command to get the compute poses
-            // from cardinal point grasps
             grasp_pose.resize(7,0.0);
-
-            // TODO Remove this to go on the real robot
-            grasp_pose[0] = -0.4;
-            grasp_pose[1] = 0.0;
-            grasp_pose[2] = -0.10;
-            grasp_pose[5] = 1.0;
-            /////////
-
             Bottle *list_values = reply.get(0).asList();
 
             for (size_t i = 0; i < list_values->size(); i++)
@@ -359,10 +350,11 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool grasp(const string &arm, const string &obj)
+    bool grasp()
     {
         string log_ID = "[grasp]";
-        object_name = obj;
+
+        yInfo() << log_ID << "Trying to move " << moving_arm << "arm";
 
         if (can_grasp)
         {
@@ -371,7 +363,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             //  grasp("cartesian" x y z gx gy gz theta) ("approach" (-0.05 0 +-0.05 0.0)) "left"/"right"
             Bottle command, reply;
 
-            // TODO Ask ARE to provide another service just to reach and grasp
+            // TODO Test with ARE
             // without lifting the object
             command.addString("grasp");
             Bottle &ptr = command.addList();
@@ -391,9 +383,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             Bottle &ptr1 = command.addList();
             ptr1.addString("approach");
             Bottle &ptr2 = ptr1.addList();
-            if (arm == robot_arm || robot_arm == "both")
+            if (moving_arm == robot_arm || robot_arm == "both")
             {
-                if (arm == "left")
+                if (moving_arm == "left")
                 {
                     for(int i=0 ; i<4 ; i++) ptr2.addDouble(grasper_approach_parameters_left[i]);
                     command.addString("left");
@@ -535,48 +527,46 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool execute_trajectory(const string &arm)
+    bool generate_trajectory()
+    {
+        return generateTrajectory();
+    }
+
+    /****************************************************************/
+    bool execute_trajectory()
     {
         string log_ID = "[execute_trajectory]";
-        if (arm != robot_arm && robot_arm != "both")
+        if (moving_arm != robot_arm && robot_arm != "both")
         {
             yError() << log_ID << "Not valid arm!";
             return false;
         }
 
-        if (!generateTrajectory())
-            return false;
+        if (trajectory.size() == 0)
+        {
+            yError() << log_ID << "Trajectory size 0!"
+;            return false;
+        }
         else
         {
             int count = 0;
 
             for (auto t : trajectory)
             {
-                if (arm == "left")
+                if (moving_arm == "left")
                 {
                     yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << "and orientation: " << t.subVector(3,6).toString();
                     icart_left->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
                     icart_left->waitMotionDone(0.4);
-                    //icart_left->getPose(reached_position, reached_orientation);
                 }
-                else if (arm == "right")
+                else if (moving_arm == "right")
                 {
                     yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << t.subVector(3,6).toString();
                     icart_right->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
                     icart_right->waitMotionDone(0.4);
-                    //icart_right->getPose(reached_position, reached_orientation);
                 }
-
-                //yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
-
-                // Vector reached_pose(7,0.0);
-                //
-                // reached_pose.setSubvector(0, reached_position);
-                // reached_pose.setSubvector(3,reached_orientation);
-                // reached_poses.push_back(reached_pose);
-
                 count ++;
             }
             return true;
@@ -586,9 +576,21 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     /****************************************************************/
     bool home(const string &arm)
     {
-        // TODO Open hand and go to home position
-        // Think how to do it
-        return true;
+        string log_ID = "[home]";
+
+        Bottle cmd, reply;
+        cmd.addVocab(Vocab::encode("home"));
+        cmd.addVocab(Vocab::encode("hands"));
+        action_render_rpc.write(cmd, reply);
+        bool cmd_success = (reply.get(0).asVocab() == Vocab::encode("ack"));
+
+        if (cmd_success)
+            return true;
+        else
+        {
+            yError() << log_ID << "Problems in going home";
+            return false;
+        }
     }
 
     /****************************************************************/
@@ -601,12 +603,14 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         {
             Vector pose_0 = grasp_pose;
 
-            // Add waypoint 0
             Vector pose_tmp = pose_0;
             pose_tmp[2] += 0.15;
-            trajectory.push_back(pose_tmp);
+            // TODO Check This
+            // It's not necessary to add this pose
+            // since ARE already lift the object of a desired height
+            //trajectory.push_back(pose_tmp);
 
-            // Compute waypoint 1
+            // Compute waypoint 0
             Matrix pose_rotate_hf(3,3);
             // This is express in hand reference frame
             Vector aa_rotate_hf(4, 0.0);
@@ -622,16 +626,16 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // Rotation required in robot reference frame
             Matrix pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
 
-            // Add waypoint 1
+            // Add waypoint 0
             pose_tmp.setSubvector(3, dcm2axis(pose_rotate_rf));
             trajectory.push_back(pose_tmp);
 
-            // Add waypoint 2
+            // Add waypoint 1
             pose_tmp = pose_0;
             pose_tmp[2] += 0.15;
             trajectory.push_back(pose_tmp);
 
-            // Compute waypoint 3
+            // Compute waypoint 2
             // This is express in hand reference frame
             aa_rotate_hf.resize(4, 0.0);
             aa_rotate_hf[0] = 1.0;
@@ -642,7 +646,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             // Rotation required in robot reference frame
             pose_rotate_rf = pose_hand_rf * pose_rotate_hf;
 
-            // Add waypoint 3
+            // Add waypoint 2
             pose_tmp.setSubvector(3, dcm2axis(pose_rotate_rf));
             trajectory.push_back(pose_tmp);
 
