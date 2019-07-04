@@ -33,12 +33,12 @@ class ArukoPoseEstimation : public RFModule
     string eye_name;
     // Prefix for ports
     string port_prefix;
-    // Marker id of the layouts
-    int marker_id;
-    // Marker lenght of the layouts
-    int marker_length;
     // Aruko Dictionary
     string dictionary_string;
+    // Number of markers in the board
+    int n_markers_x, n_markers_y;
+    // Dimensions and separation of markers in the board
+    double marker_length, marker_separation;
 
     // Choose if to show image with the estimated pose
     bool send_image;
@@ -70,10 +70,12 @@ public:
         // Read data from config.ini
         eye_name = rf.check("eye_name", Value("right")).asString();
         send_image = rf.check("send_image", Value("True")).asBool();
-        marker_id = rf.check("marker_id", Value(107)).asInt();
-        marker_length = rf.check("marker_id", Value(0.05)).asDouble();
         port_prefix = rf.check("port_prefix", Value("aruko-base-marker-estimation")).asDouble();
-        dictionary_string = rf.check("aruko_dictionary", Value("original")).asDouble();
+        dictionary_string = rf.check("aruko_dictionary", Value("4x4")).asDouble();
+        n_markers_x = rf.check("n_markers_x", Value(5)).asInt();
+        n_markers_y = rf.check("n_markers_y", Value(7)).asInt();
+        marker_length = rf.check("marker_length", Value(0.05)).asDouble();
+        marker_separation = rf.check("marker_separation", Value(0.038)).asDouble();
 
         gaze = new::GazeController(port_prefix);
 
@@ -133,7 +135,7 @@ public:
         if (dictionary_string == "original")
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
         else if (dictionary_string == "4x4")
-            dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
+            dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_100);
     }
 
     /****************************************************************/
@@ -179,36 +181,21 @@ public:
         std::vector<std::vector<cv::Point2f> > corners, rejected;
         cv::aruco::detectMarkers(image, dictionary, corners, ids);
 
-        // Search for a feasible id
-        bool found_marker = false;
-        int marker_index;
-        for (std::size_t i = 0; i < ids.size(); i++)
-        {
-            if (marker_id == ids[i])
-            {
-                found_marker = true;
+        // Create boards (with same values as the printed one)
+        cv::Ptr<cv::aruco::Board> board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, marker_length, marker_separation, dictionary);
 
-                break;
-            }
-        }
-
-        if (!found_marker)
-        {
-            yInfo() << log_ID << "Marker not found";
-            return true;
-        }
-
-        yInfo() << log_ID << "Marker found";
-
-        // Estimate pose of markers
-        std::vector<cv::Vec3d> rvecs, tvecs;
-        cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
+        // Estimate pose of the board
+        cv::Vec3d rvec, tvec;
+        //cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
+        cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
 
         if (send_image)
         {
-            // Draw everything was detected for debugging purposes
-            for(int i = 0; i < ids.size(); i++)
-                cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.1);
+            // Draw the detected markers
+            if(ids.size() > 0)
+                cv::aruco::drawDetectedMarkers(image, corners, ids);
+            // Draw the estimated pose of the board
+            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.1);
 
             // Send the image
             cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
@@ -224,17 +211,24 @@ public:
 
         // Compose marker pose
         Vector pos_wrt_cam(3);
-        pos_wrt_cam(0) = tvecs.at(0)(0);
-        pos_wrt_cam(1) = tvecs.at(0)(1);
-        pos_wrt_cam(2) = tvecs.at(0)(2);
+        pos_wrt_cam(0) = tvec(0);
+        pos_wrt_cam(1) = tvec(1);
+        pos_wrt_cam(2) = tvec(2);
 
         cv::Mat att_wrt_cam_cv;
-        cv::Rodrigues(rvecs[0], att_wrt_cam_cv);
+        cv::Rodrigues(rvec, att_wrt_cam_cv);
         Matrix att_wrt_cam_yarp(3, 3);
 
         for (size_t i=0; i<3; i++)
             for (size_t j=0; j<3; j++)
                 att_wrt_cam_yarp(i, j) = att_wrt_cam_cv.at<double>(i, j);
+
+        // TODO translate origin of the board (to be tested)
+        // Vector direction(3,0.0);
+        // direction = att_wrt_cam_yarp.subcol(0,0,3) + att_wrt_cam_yarp.subcol(0,1,3);
+        // direction /= norm(direction);
+        // pos_wrt_cam += marker_length/2.0 * direction;
+        ///
 
         Matrix marker_transform(4,4);
         marker_transform.setSubcol(pos_wrt_cam, 0,3);
