@@ -228,6 +228,12 @@ public:
         // direction = att_wrt_cam_yarp.subcol(0,0,3) + att_wrt_cam_yarp.subcol(0,1,3);
         // direction /= norm(direction);
         // pos_wrt_cam += marker_length/2.0 * direction;
+        // Matrix R_around_z(3,3);
+        // R_around_z.zero();
+        // R_around_z(0,1) = 1.0;
+        // R_around_z(1,0) = -1.0;
+        // R_around_z(2,2) = 1.0;
+        // att_wrt_cam_yarp = R_around_z * att_wrt_cam_yarp;
         ///
 
         Matrix marker_transform(4,4);
