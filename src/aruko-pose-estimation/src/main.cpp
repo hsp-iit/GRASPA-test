@@ -46,6 +46,9 @@ class ArukoPoseEstimation : public RFModule
     // Dictionary of the marker
     cv::Ptr<cv::aruco::Dictionary> dictionary;
 
+    // Aruco board
+    cv::Ptr<cv::aruco::GridBoard> board;
+
     // A library with high level interface to iKinGazeCtrl
     GazeController *gaze;
 
@@ -76,6 +79,15 @@ public:
         n_markers_y = rf.check("n_markers_y", Value(7)).asInt();
         marker_length = rf.check("marker_length", Value(0.05)).asDouble();
         marker_separation = rf.check("marker_separation", Value(0.038)).asDouble();
+
+	yInfo() << "=====================================";
+	yInfo() << "eye_name " << eye_name;
+	yInfo() << "n_markers_x " << n_markers_x;
+	yInfo() << "n_markers_y " << n_markers_y;
+	yInfo() << "marker_length " << marker_length;
+	yInfo() << "marker_separation " << marker_separation;
+	yInfo() << "dictionary_string " << dictionary_string;
+	yInfo() << "=====================================";
 
         gaze = new::GazeController(port_prefix);
 
@@ -138,6 +150,9 @@ public:
         else if (dictionary_string == "4x4")
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
+	// Create boards (with same values as the printed one)
+        board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, marker_length, marker_separation, dictionary);
+
 	return true;
     }
 
@@ -158,7 +173,7 @@ public:
     /****************************************************************/
     double getPeriod()
     {
-        return 0,1;
+        return 0.1;
     }
 
     /****************************************************************/
@@ -167,7 +182,9 @@ public:
         string log_ID = "[UpdateModule]";
         // Read from the camera
         ImageOf<PixelRgb>* image_in;
+
         image_in = port_image_in.read(true);
+
 
         if (image_in == nullptr)
             return true;
@@ -182,25 +199,31 @@ public:
         // Perform marker detection
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f> > corners, rejected;
-        cv::aruco::detectMarkers(image, dictionary, corners, ids);
+	cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+	
+        cv::aruco::detectMarkers(image, dictionary, corners, ids, parameters, rejected);
 
-        // Create boards (with same values as the printed one)
-        cv::Ptr<cv::aruco::Board> board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, marker_length, marker_separation, dictionary);
+	cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
 
         // Estimate pose of the board
         cv::Vec3d rvec, tvec;
-        //cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
-        cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
+        int valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec, true);
+
+
         if (send_image)
         {
             // Draw the detected markers
             if(ids.size() > 0)
                 cv::aruco::drawDetectedMarkers(image, corners, ids);
             // Draw the estimated pose of the board
-            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.1);
+	    if (valid > 0 )
+                 cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.1);
+	    else
+		 yError() << "Not valid estimated board pose!";
 
             // Send the image
             cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+
             port_image_out.write();
         }
 
@@ -292,6 +315,7 @@ public:
             eye_pos = eye_pos_right;
             eye_att = eye_att_right;
         }
+
 
         camera_trans.setSubmatrix(axis2dcm(eye_att), 0, 0);
 	camera_trans.setSubcol(eye_pos, 0,3);
