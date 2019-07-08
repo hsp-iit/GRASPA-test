@@ -3,55 +3,55 @@
     <module>
     <name>aruko-pose-estimation</name>
         <parameters>--from config_base.ini</parameters>
-        <node>localhost</node>
+        <node>icub21</node>
     </module>
     <module>
         <name>aruko-pose-estimation</name>
         <parameters>--from config_hand.ini</parameters>
-        <node>localhost</node>
+        <node>icub21</node>
     </module>
     <module>
         <name>reaching-test</name>
         <parameters> --from config.ini </parameters>
-        <node>localhost</node>
+        <node>icub21</node>
     </module>
     <module>
         <name>camera-calibration-test</name>
         <parameters> --from config.ini </parameters>
-        <node>localhost</node>
+        <node>icub21</node>
     </module>
         <module>
         <name>grasp-and-stability</name>
         <parameters> --from config.ini </parameters>
-        <node>localhost</node>
+        <node>icub21</node>
     </module>
     <module>
         <name>actionsRenderingEngine</name>
         <parameters> --block_eyes 5.0 --go_up 0.15 </parameters>
-        <node>localhost</node>
+        <node>icub21</node>
     </module>
     <module>
         <name>yarpview</name>
-        <parameters>--name viewer/left/marker_pose:i</parameters>
-        <node>localhost</node>
+        <parameters>--name /viewer/left/marker_pose:i</parameters>
+        <node>icub21</node>
         <prefix></prefix>
     </module>
     <module>
         <name>yarpview</name>
-        <parameters>--name viewer/right/marker_pose:i</parameters>
-        <node>localhost</node>
+        <parameters>--name /viewer/right/marker_pose:i</parameters>
+        <node>icub21</node>
         <prefix></prefix>
     </module>
     <module>
         <name>yarpview</name>
-        <parameters>--name viewer/right/hand_pose:i</parameters>
-        <node>localhost</node>
+        <parameters>--name /viewer/right/hand_pose:i</parameters>
+        <node>icub21</node>
         <prefix></prefix>
     </module>
     <module>
         <name>yarpview</name>
-        <parameters>--name viewer/left/hand_pose:i</parameters>
-        <node>localhost</node>
+        <parameters>--name /viewer/left/hand_pose:i</parameters>
+        <node>icub21</node>
         <prefix></prefix>
     </module>
     <connection>

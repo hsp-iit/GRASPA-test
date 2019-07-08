@@ -14,4 +14,4 @@ distortion_coefficients: !!opencv-matrix
    rows: 1
    cols: 5
    dt: d
-data: [0.0, 0.0, 0.0, 0.0, 0.0]
+   data: [0.0, 0.0, 0.0, 0.0, 0.0]
