@@ -151,7 +151,7 @@ public:
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
 	// Create boards (with same values as the printed one)
-        board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, marker_length, marker_separation, dictionary);
+        board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, static_cast<float>(marker_length), static_cast<float>(marker_separation), dictionary);
 
 	return true;
     }
@@ -185,7 +185,6 @@ public:
 
         image_in = port_image_in.read(true);
 
-
         if (image_in == nullptr)
             return true;
 
@@ -207,8 +206,8 @@ public:
 
         // Estimate pose of the board
         cv::Vec3d rvec, tvec;
-        int valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec, true);
 
+        int valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
 
         if (send_image)
         {
@@ -217,14 +216,9 @@ public:
                 cv::aruco::drawDetectedMarkers(image, corners, ids);
             // Draw the estimated pose of the board
 	    if (valid > 0 )
-                 cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.1);
+                 cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.05);
 	    else
 		 yError() << "Not valid estimated board pose!";
-
-            // Send the image
-            cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
-
-            port_image_out.write();
         }
 
         // Get camera pose
@@ -248,11 +242,23 @@ public:
             for (size_t j=0; j<3; j++)
                 att_wrt_cam_yarp(i, j) = att_wrt_cam_cv.at<double>(i, j);
 
-        // TODO translate origin of the board (to be tested)
-        // Vector direction(3,0.0);
-        // direction = att_wrt_cam_yarp.subcol(0,0,3) + att_wrt_cam_yarp.subcol(0,1,3);
-        // direction /= norm(direction);
-        // pos_wrt_cam += marker_length/2.0 * direction;
+        Vector direction(3,0.0);
+        direction = att_wrt_cam_yarp.transposed().subcol(0,0,3);
+        direction /= norm(direction);
+        pos_wrt_cam += (marker_length * n_markers_x + marker_separation * (n_markers_x-1)) * direction;
+
+	cv::Vec3d tvec_translated;
+	tvec_translated[0] = pos_wrt_cam[0];
+	tvec_translated[1] = pos_wrt_cam[1];
+	tvec_translated[2] = pos_wrt_cam[2];
+
+	if (send_image)
+	{
+	    cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec_translated, 0.1);
+	    cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+            port_image_out.write(false);    
+	}
+
         // Matrix R_around_z(3,3);
         // R_around_z.zero();
         // R_around_z(0,1) = 1.0;
@@ -276,6 +282,7 @@ public:
         yInfo() << log_ID << "Transform from root frame to marker frame ";
 	yDebug() << transform.toString();
 
+	double t_send_pose = Time::now();
         // Send estimated pose via port
         Vector& pose_yarp = port_aruco_pose_out.prepare();
         pose_yarp.resize(7);
