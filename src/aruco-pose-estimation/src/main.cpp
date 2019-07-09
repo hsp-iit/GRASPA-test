@@ -27,14 +27,16 @@ using namespace yarp::cv;
 using namespace std;
 
 /****************************************************************/
-class ArukoPoseEstimation : public RFModule
+class ArucoPoseEstimation : public RFModule
 {
     // Camera name
     string eye_name;
     // Prefix for ports
     string port_prefix;
-    // Aruko Dictionary
+    // Aruco Dictionary
     string dictionary_string;
+    // Switch between board and marker estimate poses
+    bool use_board;
     // Number of markers in the board
     int n_markers_x, n_markers_y;
     // Dimensions and separation of markers in the board
@@ -73,21 +75,22 @@ public:
         // Read data from config.ini
         eye_name = rf.check("eye_name", Value("right")).asString();
         send_image = rf.check("send_image", Value("True")).asBool();
-        port_prefix = rf.check("port_prefix", Value("aruko-base-marker-estimation")).asString();
-        dictionary_string = rf.check("aruko_dictionary", Value("4x4")).asString();
+        port_prefix = rf.check("port_prefix", Value("aruco-base-marker-estimation")).asString();
+        dictionary_string = rf.check("aruco_dictionary", Value("4x4")).asString();
         n_markers_x = rf.check("n_markers_x", Value(5)).asInt();
         n_markers_y = rf.check("n_markers_y", Value(7)).asInt();
         marker_length = rf.check("marker_length", Value(0.05)).asDouble();
         marker_separation = rf.check("marker_separation", Value(0.038)).asDouble();
+        use_board = rf.check("use_board", Value(true)).asBool();
 
-	yInfo() << "=====================================";
-	yInfo() << "eye_name " << eye_name;
-	yInfo() << "n_markers_x " << n_markers_x;
-	yInfo() << "n_markers_y " << n_markers_y;
-	yInfo() << "marker_length " << marker_length;
-	yInfo() << "marker_separation " << marker_separation;
-	yInfo() << "dictionary_string " << dictionary_string;
-	yInfo() << "=====================================";
+        yInfo() << "=====================================";
+        yInfo() << "eye_name " << eye_name;
+        yInfo() << "n_markers_x " << n_markers_x;
+        yInfo() << "n_markers_y " << n_markers_y;
+        yInfo() << "marker_length " << marker_length;
+        yInfo() << "marker_separation " << marker_separation;
+        yInfo() << "dictionary_string " << dictionary_string;
+        yInfo() << "=====================================";
 
         gaze = new::GazeController(port_prefix);
 
@@ -115,7 +118,7 @@ public:
         // Find the path of the camera intrinsic parameters
         ResourceFinder rf_ground_truth;
         rf_ground_truth.setVerbose(true);
-        rf_ground_truth.setDefaultContext("aruko-pose-estimation");
+        rf_ground_truth.setDefaultContext("aruco-pose-estimation");
         std::string intrinsic_path = rf_ground_truth.findFile("opencv_icub_intrinsics_" + eye_name);
 
         // Load camera intrinsic parameters
@@ -150,10 +153,10 @@ public:
         else if (dictionary_string == "4x4")
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
-	// Create boards (with same values as the printed one)
+        // Create boards (with same values as the printed one)
         board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, static_cast<float>(marker_length), static_cast<float>(marker_separation), dictionary);
 
-	return true;
+        return true;
     }
 
     /****************************************************************/
@@ -198,16 +201,26 @@ public:
         // Perform marker detection
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f> > corners, rejected;
-	cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
-	
+        cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+
         cv::aruco::detectMarkers(image, dictionary, corners, ids, parameters, rejected);
 
-	cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
+        cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
 
         // Estimate pose of the board
         cv::Vec3d rvec, tvec;
 
-        int valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
+        vector<cv::Vec3d> rvecs, tvecs;
+        int valid = 0;
+
+        if (use_board)
+            valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
+        else
+        {
+            valid = 1;
+            cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
+        }
+
 
         if (send_image)
         {
@@ -215,10 +228,15 @@ public:
             if(ids.size() > 0)
                 cv::aruco::drawDetectedMarkers(image, corners, ids);
             // Draw the estimated pose of the board
-	    if (valid > 0 )
-                 cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.05);
-	    else
-		 yError() << "Not valid estimated board pose!";
+            if (valid > 0 && use_board == true)
+                cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec, 0.05);
+            else if (valid > 0 && use_board == false)
+            {
+                for (size_t i = 0; i < ids.size(); i++)
+                    cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
+            }
+            else
+                yError() << "Not valid estimated board pose!";
         }
 
         // Get camera pose
@@ -247,17 +265,17 @@ public:
         direction /= norm(direction);
         pos_wrt_cam += (marker_length * n_markers_x + marker_separation * (n_markers_x-1)) * direction;
 
-	cv::Vec3d tvec_translated;
-	tvec_translated[0] = pos_wrt_cam[0];
-	tvec_translated[1] = pos_wrt_cam[1];
-	tvec_translated[2] = pos_wrt_cam[2];
+        cv::Vec3d tvec_translated;
+        tvec_translated[0] = pos_wrt_cam[0];
+        tvec_translated[1] = pos_wrt_cam[1];
+        tvec_translated[2] = pos_wrt_cam[2];
 
-	if (send_image)
-	{
-	    cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec_translated, 0.1);
-	    cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
-            port_image_out.write(false);    
-	}
+        if (send_image)
+        {
+            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec_translated, 0.1);
+            cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+                port_image_out.write(false);
+        }
 
         // Matrix R_around_z(3,3);
         // R_around_z.zero();
@@ -270,19 +288,19 @@ public:
         Matrix marker_transform(4,4);
         marker_transform.setSubcol(pos_wrt_cam, 0,3);
         marker_transform.setSubmatrix(att_wrt_cam_yarp, 0, 0);
-	marker_transform(3,3) = 1.0;
+        marker_transform(3,3) = 1.0;
 
         yInfo() << log_ID << "Transform from camera frame to marker frame ";
-	yDebug() << marker_transform.toString();
+        yDebug() << marker_transform.toString();
 
         // Compose transform from root frame to marker frame
         Matrix transform = camera_transform * marker_transform;
-	transform(3,3) = 1.0;
+        transform(3,3) = 1.0;
 
         yInfo() << log_ID << "Transform from root frame to marker frame ";
-	yDebug() << transform.toString();
+        yDebug() << transform.toString();
 
-	double t_send_pose = Time::now();
+        double t_send_pose = Time::now();
         // Send estimated pose via port
         Vector& pose_yarp = port_aruco_pose_out.prepare();
         pose_yarp.resize(7);
@@ -325,12 +343,12 @@ public:
 
 
         camera_trans.setSubmatrix(axis2dcm(eye_att), 0, 0);
-	camera_trans.setSubcol(eye_pos, 0,3);
-	camera_trans(3,3) = 1.0;
+        camera_trans.setSubcol(eye_pos, 0,3);
+        camera_trans(3,3) = 1.0;
 
         yDebug() << log_ID << "Transform from root frame to camera frame ";
 
-	yDebug() << camera_trans.toString();
+        yDebug() << camera_trans.toString();
 
         return true;
     }
@@ -342,7 +360,7 @@ int main(int argc, char** argv)
     const std::string log_ID = "[Main]";
     yInfo() << log_ID << "Configuring and starting module...";
 
-    //const std::string port_prefix = "aruko-pose-estimation";
+    //const std::string port_prefix = "aruco-pose-estimation";
 
     std::unique_ptr<Network> yarp;
     yarp = std::move(std::unique_ptr<Network>(new Network()));
@@ -354,11 +372,11 @@ int main(int argc, char** argv)
     }
 
     ResourceFinder rf;
-    rf.setDefaultContext("aruko-pose-estimation");
+    rf.setDefaultContext("aruco-pose-estimation");
     rf.setDefaultConfigFile("config_base.ini");
     rf.configure(argc, argv);
 
-    ArukoPoseEstimation module;
+    ArucoPoseEstimation module;
 
     return module.runModule(rf);
 }

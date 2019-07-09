@@ -479,25 +479,25 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         string log_ID = "[ConvertPoses]";
 
         // TODO Uncomment this to receive marker pose from port
-        //Vector *marker_pose = port_marker_pose_in.read();
+        Vector *marker_pose = port_marker_pose_in.read();
 
         // TODO Temporary for tests in simulation: Remove this once
         // connected to the port
-        Vector position(3);
-        position(0) = -0.15;
-        position(1) = 0.2;
-        position(2) = -0.15;
-
-        Vector orientation(4, 0.0);
-        orientation(2) = 1.0;
-        orientation(3) = 1.57;
-
-        Vector marker(7);
-        marker.resize(7,0.0);
-        marker.setSubvector(0,position);
-        marker.setSubvector(3,orientation);
-
-        Vector *marker_pose = &marker;
+        // Vector position(3);
+        // position(0) = -0.15;
+        // position(1) = 0.2;
+        // position(2) = -0.15;
+        //
+        // Vector orientation(4, 0.0);
+        // orientation(2) = 1.0;
+        // orientation(3) = 1.57;
+        //
+        // Vector marker(7);
+        // marker.resize(7,0.0);
+        // marker.setSubvector(0,position);
+        // marker.setSubvector(3,orientation);
+        //
+        // Vector *marker_pose = &marker;
         ///////
 
         if (marker_pose != NULL)

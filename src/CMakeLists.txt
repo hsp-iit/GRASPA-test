@@ -9,9 +9,9 @@
 
 add_subdirectory(gaze-ctrl-lib)
 
-option(BUILD_ARUKO_POSE_ESTIMATION "Build aruko-pose-estimation" ON)
-if (BUILD_ARUKO_POSE_ESTIMATION)
-  add_subdirectory(aruko-pose-estimation)
+option(BUILD_ARUCO_POSE_ESTIMATION "Build aruco-pose-estimation" ON)
+if (BUILD_ARUCO_POSE_ESTIMATION)
+  add_subdirectory(aruco-pose-estimation)
 endif()
 
 option(BUILD_CAMERA_CALIBRATION_TEST "Build camera-calibration-test" ON)

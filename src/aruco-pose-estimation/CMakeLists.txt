@@ -7,7 +7,7 @@
 #
 #===============================================================================
 
-set(EXE_TARGET_NAME aruko-pose-estimation)
+set(EXE_TARGET_NAME aruco-pose-estimation)
 
 # YARP
 find_package(YARP CONFIG REQUIRED
@@ -51,6 +51,6 @@ set(${EXE_TARGET_NAME}_CONF ${CMAKE_CURRENT_SOURCE_DIR}/conf/config_base.ini
                             ${CMAKE_CURRENT_SOURCE_DIR}/conf/opencv_icub_intrinsics_right
                             )
 
-yarp_install(FILES ${${EXE_TARGET_NAME}_CONF} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/aruko-pose-estimation)
+yarp_install(FILES ${${EXE_TARGET_NAME}_CONF} DESTINATION ${ICUBCONTRIB_CONTEXTS_INSTALL_DIR}/aruco-pose-estimation)
 
 install(TARGETS ${EXE_TARGET_NAME} DESTINATION bin)
