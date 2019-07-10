@@ -75,6 +75,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         file_layout = rf.check("file-layout", Value("layout_0.xml")).asString();
         reached_poses_file = rf.check("file-reached-poses", Value("test.xml")).asString();
 
+	yDebug() << "======================";
+	yDebug() << "file layout " << file_layout;
+	yDebug() << "reached_poses_file" << reached_poses_file;
+
         // Read robot name
         if(!rf.check("robot"))
         {
@@ -517,9 +521,6 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 position_omog.setSubvector(0,poses_layout[i].subVector(0,2));
 
                 Vector new_position = marker_pose_matrix * position_omog;
-
-                yDebug() << "Test " << poses_layout[i].subVector(0,2).toString();
-                yDebug() << "Test " << (marker_pose_matrix.submatrix(0,2,0,2) * poses_layout[i].subVector(0,2)).toString();
 
                 poses_layout[i].setSubvector(0, new_position);
                 poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));
