@@ -282,7 +282,22 @@ public:
             for (size_t j=0; j<3; j++)
                 att_wrt_cam_yarp(i, j) = att_wrt_cam_cv.at<double>(i, j);
 
-	if (use_board)
+	if (use_board == false)
+	{
+		Vector direction(3,0.0);
+		direction = att_wrt_cam_yarp.subcol(0,0,3);
+		direction /= norm(direction);
+		pos_wrt_cam+= 0.03 * direction;
+
+		direction = att_wrt_cam_yarp.subcol(0,1,3);
+		direction /= norm(direction);
+		pos_wrt_cam += 0.01 * direction;
+
+		direction = att_wrt_cam_yarp.subcol(0,2,3);
+		direction /= norm(direction);
+		pos_wrt_cam -= 0.05 * direction;
+	}
+	else
 	{
 		Vector direction(3,0.0);
 		direction = att_wrt_cam_yarp.subcol(0,0,3);
