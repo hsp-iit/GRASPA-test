@@ -285,24 +285,24 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     yInfo() << log_ID << "Going to pose No." << pose_count << " with position: " << poses_layout[pose_count].subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << "and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
-                    icart_left->waitMotionDone(0.4);
+                    icart_left->waitMotionDone(0.4, 4.0);
                     icart_left->getPose(reached_position, reached_orientation);
 
                     yInfo() << log_ID << "Going to home position";
                     icart_left->goToPoseSync(home_pos_left, home_orie_left);
-                    icart_left->waitMotionDone(0.4);
+                    icart_left->waitMotionDone(0.4, 4.0);
                 }
                 else if (arm == "right")
                 {
                     yInfo() << log_ID << "Going to pose No." << pose_count << " with position: " << poses_layout[pose_count].subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
-                    icart_right->waitMotionDone(0.4);
+                    icart_right->waitMotionDone(0.4, 4.0);
                     icart_right->getPose(reached_position, reached_orientation);
 
                     yInfo() << log_ID << "Going to home position" << home_pos_right.toString() << home_orie_right.toString();
                     icart_right->goToPoseSync(home_pos_right, home_orie_right);
-                    icart_right->waitMotionDone(0.4);
+                    icart_right->waitMotionDone(0.4, 4.0);
                 }
 
                 yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
@@ -520,6 +520,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             yInfo() << log_ID << "Received marker pose (Vector): " << marker_pose->toString();
             yInfo() << log_ID << "Received marker pose (Matrix): " << marker_pose_matrix.toString();
 
+	    yInfo() << log_ID << "Poses in robot frame :";
+
             for (size_t i = 0 ; i < poses_layout.size() ; i++)
             {
                 Vector position_omog(4,1.0);
@@ -529,6 +531,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                 poses_layout[i].setSubvector(0, new_position.subVector(0,2));
                 poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));
+		yInfo() << log_ID << poses_layout[i].toString();
             }
 
             return true;
