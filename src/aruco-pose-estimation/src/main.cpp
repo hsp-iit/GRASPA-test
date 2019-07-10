@@ -302,6 +302,7 @@ public:
 		Vector direction(3,0.0);
 		direction = att_wrt_cam_yarp.subcol(0,0,3);
 		direction /= norm(direction);
+		// TODO This needs to be fixed once we now the extact position of the markers w.r.t to marker frame in simox
 		pos_wrt_cam += (marker_length * n_markers_x + marker_separation * (n_markers_x-1)) * direction;
 	}
 

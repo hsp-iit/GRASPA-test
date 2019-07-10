@@ -126,7 +126,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
                     icart_left->setDOF(new_dof, dof);
-                    icart_left->setInTargetTol(0.001);
+                    icart_left->setInTargetTol(0.005);
                     icart_left->setLimits(0, 0.0, 15.0);
 
                     icart_left->getPose(home_pos_left, home_orie_left);
@@ -151,7 +151,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
                     icart_right->setDOF(new_dof, dof);
-                    icart_right->setInTargetTol(0.001);
+                    icart_right->setInTargetTol(0.005);
                     icart_right->setLimits(0, 0.0, 15.0);
 
                     icart_right->getPose(home_pos_right, home_orie_right);
@@ -257,6 +257,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         if (pose_count < poses_layout.size())
         {
             yInfo() << log_ID << " Next pose to be executed: no. : "<< pose_count << ", value: " << poses_layout[pose_count].toString();
+	    yInfo() << log_ID << "In matrix form : " << axis2dcm(poses_layout[pose_count].subVector(3,6)).toString();
             return poses_layout[pose_count];
         }
         else
@@ -451,7 +452,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                             for (pugi::xml_attribute attr = row.first_attribute(); attr; attr = attr.next_attribute())
                             {
-                                transform(i,j)=attr.as_double()/1000.0;
+				if (j == 3 && i < 3)
+                                    transform(i,j)=attr.as_double()/1000.0;
+				else
+				    transform(i,j)=attr.as_double();
                                 j++;
                             }
 
@@ -466,6 +470,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                 Vector pose_7D(7, 0.0);
                 pose_7D.setSubvector(0, transform.getCol(3).subVector(0,2));
+
                 pose_7D.setSubvector(3, dcm2axis(transform.submatrix(0,2,0,2)));
 
                 poses_layout.push_back(pose_7D);
@@ -522,7 +527,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                 Vector new_position = marker_pose_matrix * position_omog;
 
-                poses_layout[i].setSubvector(0, new_position);
+                poses_layout[i].setSubvector(0, new_position.subVector(0,2));
                 poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));
             }
 
