@@ -133,7 +133,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
                     icart_left->setDOF(new_dof, dof);
-                    icart_left->setInTargetTol(0.001);
+                    icart_left->setInTargetTol(0.005);
                     icart_left->setLimits(0, 0.0, 15.0);
 
                     icart_left->getPose(home_pos_left, home_orie_left);
@@ -158,7 +158,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
                     icart_right->setDOF(new_dof, dof);
-                    icart_right->setInTargetTol(0.001);
+                    icart_right->setInTargetTol(0.005);
                     icart_right->setLimits(0, 0.0, 15.0);
                     
                     icart_right->getPose(home_pos_right, home_orie_right);
@@ -293,6 +293,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         if (pose_count < poses_layout.size())
         {
             yInfo() << log_ID << " Next pose to be executed: no. : "<< pose_count << ", value: " << poses_layout[pose_count].toString();
+	    yInfo() << log_ID << "In matrix form : " << axis2dcm(poses_layout[pose_count].subVector(3,6)).toString();
             return poses_layout[pose_count];
         }
         else
@@ -324,7 +325,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     yInfo() << log_ID << "Going to pose No." << pose_count << " with position: " << poses_layout[pose_count].subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << "and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_left->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
-                    icart_left->waitMotionDone(0.4);
+                    icart_left->waitMotionDone(0.4, 4.0);
                     icart_left->getPose(pos_cart, orie_cart);
 
                     if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart))
@@ -335,14 +336,14 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                     yInfo() << log_ID << "Going to home position";
                     icart_left->goToPoseSync(home_pos_left, home_orie_left);
-                    icart_left->waitMotionDone(0.4);
+                    icart_left->waitMotionDone(0.4, 4.0);
                 }
                 else if (arm == "right")
                 {
                     yInfo() << log_ID << "Going to pose No." << pose_count << " with position: " << poses_layout[pose_count].subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << poses_layout[pose_count].subVector(3,6).toString();
                     icart_right->goToPoseSync(poses_layout[pose_count].subVector(0,2), poses_layout[pose_count].subVector(3,6));
-                    icart_right->waitMotionDone(0.4);
+                    icart_right->waitMotionDone(0.4, 4.0);
                     icart_right->getPose(pos_cart, orie_cart);
 
                     if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart))
@@ -353,7 +354,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                     yInfo() << log_ID << "Going to home position" << home_pos_right.toString() << home_orie_right.toString();
                     icart_right->goToPoseSync(home_pos_right, home_orie_right);
-                    icart_right->waitMotionDone(0.4);
+                    icart_right->waitMotionDone(0.4, 4.0);
                 }
 
                 yInfo() << log_ID << "Reached position: " << reached_position.toString() << "with orientation: " << reached_orientation.toString();
@@ -389,10 +390,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         igaze->waitMotionDone();
 
         // Get position from aruko module TODO: Uncomment this on real robot
-        //Vector *hand_marker_pose = port_marker_pose_hand_in.read();
+        Vector *hand_marker_pose = port_marker_pose_hand_in.read();
 
-        Vector hand_pose(7,0.0);
-        Vector *hand_marker_pose = &hand_pose;
+        //Vector hand_pose(7,0.0);
+        //Vector *hand_marker_pose = &hand_pose;
 
         if (hand_marker_pose != NULL)
         {
@@ -547,7 +548,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                             for (pugi::xml_attribute attr = row.first_attribute(); attr; attr = attr.next_attribute())
                             {
-                                transform(i,j)=attr.as_double()/1000.0;
+                                if (j == 3 && i < 3)
+                                    transform(i,j)=attr.as_double()/1000.0;
+				else
+				    transform(i,j)=attr.as_double();
                                 j++;
                             }
 
@@ -579,25 +583,25 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         string log_ID = "[ConvertPoses]";
 
         // TODO Uncomment this to receive marker pose from port
-        //Vector *marker_pose = port_marker_pose_in.read();
+        Vector *marker_pose = port_marker_pose_base_in.read();
 
         // TODO Temporary for tests in simulation: Remove this once
         // connected to the port
-        Vector position(3);
-        position(0) = -0.15;
-        position(1) = 0.2;
-        position(2) = -0.15;
+        //Vector position(3);
+        //position(0) = -0.15;
+        //position(1) = 0.2;
+        //position(2) = -0.15;
 
-        Vector orientation(4, 0.0);
-        orientation(2) = 1.0;
-        orientation(3) = 1.57;
+        //Vector orientation(4, 0.0);
+        //orientation(2) = 1.0;
+        //orientation(3) = 1.57;
 
-        Vector marker(7);
-        marker.resize(7,0.0);
-        marker.setSubvector(0,position);
-        marker.setSubvector(3,orientation);
+        //Vector marker(7);
+        //marker.resize(7,0.0);
+        //marker.setSubvector(0,position);
+        //marker.setSubvector(3,orientation);
 
-        Vector *marker_pose = &marker;
+        //Vector *marker_pose = &marker;
         ///////
 
         if (marker_pose != NULL)
@@ -621,7 +625,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 yDebug() << "Test " << poses_layout[i].subVector(0,2).toString();
                 yDebug() << "Test " << (marker_pose_matrix.submatrix(0,2,0,2) * poses_layout[i].subVector(0,2)).toString();
 
-                poses_layout[i].setSubvector(0, new_position);
+                poses_layout[i].setSubvector(0, new_position.subVector(0,2));
                 poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));
             }
 
@@ -653,7 +657,7 @@ int main(int argc, char** argv)
     }
 
     ResourceFinder rf;
-    rf.setDefaultContext("reaching-test");
+    rf.setDefaultContext("camera-calibration-test");
     rf.setDefaultConfigFile("config.ini");
     rf.configure(argc, argv);
 
