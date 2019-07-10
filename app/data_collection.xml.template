@@ -1,12 +1,12 @@
 <application>
     <name>RAL Grasping Benchmark - Data Collection</name>
     <module>
-    <name>aruko-pose-estimation</name>
+    <name>aruco-pose-estimation</name>
         <parameters>--from config_base.ini</parameters>
         <node>icub21</node>
     </module>
     <module>
-        <name>aruko-pose-estimation</name>
+        <name>aruco-pose-estimation</name>
         <parameters>--from config_hand.ini</parameters>
         <node>icub21</node>
     </module>
@@ -55,12 +55,12 @@
         <prefix></prefix>
     </module>
     <connection>
-        <from>/aruko-base-marker-estimation/marker-estimate/estimate:o</from>
+        <from>/aruco-base-marker-estimation/marker-estimate/estimate:o</from>
         <to>/reaching-test/pose:in</to>
         <protocol>fast_tcp</protocol>
     </connection>
     <connection>
-        <from>/aruko-base-marker-estimation/marker-estimate/estimate:o</from>
+        <from>/aruco-base-marker-estimation/marker-estimate/estimate:o</from>
         <to>/camera-calibration-test/pose_layout:in</to>
         <protocol>fast_tcp</protocol>
     </connection>
@@ -71,21 +71,21 @@
     </connection>
     <connection>
         <from>/icub/camcalib/right/out</from>
-        <to>/aruko-base-marker-estimation/cam/right:i</to>
+        <to>/aruco-base-marker-estimation/cam/right:i</to>
         <protocol>mjpeg</protocol>
     </connection>
     <connection>
         <from>/icub/camcalib/left/out</from>
-        <to>/aruko-base-marker-estimation/cam/left:i</to>
+        <to>/aruco-base-marker-estimation/cam/left:i</to>
         <protocol>mjpeg</protocol>
     </connection>
     <connection>
-        <from>/aruko-base-marker-estimation/cam/right:o</from>
+        <from>/aruco-base-marker-estimation/cam/right:o</from>
         <to>/viewer/right/marker_pose:i</to>
         <protocol>mjpeg</protocol>
     </connection>
     <connection>
-        <from>/aruko-base-marker-estimation/cam/left:o</from>
+        <from>/aruco-base-marker-estimation/cam/left:o</from>
         <to>/viewer/left/marker_pose:i</to>
         <protocol>mjpeg</protocol>
     </connection>
@@ -110,7 +110,7 @@
         <protocol>mjpeg</protocol>
     </connection>
     <connection>
-        <from>/aruko-base-marker-estimation/marker-estimate/estimate:o</from>
+        <from>/aruco-base-marker-estimation/marker-estimate/estimate:o</from>
         <to>/grasp-and-stability/pose:in</to>
         <protocol>fast_tcp</protocol>
     </connection>
