@@ -285,7 +285,7 @@ public:
 	if (use_board)
 	{
 		Vector direction(3,0.0);
-		direction = att_wrt_cam_yarp.transposed().subcol(0,0,3);
+		direction = att_wrt_cam_yarp.subcol(0,0,3);
 		direction /= norm(direction);
 		pos_wrt_cam += (marker_length * n_markers_x + marker_separation * (n_markers_x-1)) * direction;
 	}
