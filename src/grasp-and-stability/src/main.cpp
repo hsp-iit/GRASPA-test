@@ -367,7 +367,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 		    }
 
 		    yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
-
+		    yInfo() << log_ID << "As rotation matrix: " << axis2dcm(grasp_pose.subVector(3,6)).submatrix(0,2,0,2).toString();
 		    can_grasp = true;
 		    return true;
 		}
@@ -691,6 +691,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             for (auto p : trajectory)
             {
                 yInfo() << log_ID << "No. " << count << " : " << p.toString();
+		yInfo() << log_ID << "As rotation matrix: " << axis2dcm(p.subVector(3,6)).submatrix(0,2,0,2).toString();
                 count++;
             }
 
