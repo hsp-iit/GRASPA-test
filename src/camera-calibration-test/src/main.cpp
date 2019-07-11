@@ -160,7 +160,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     icart_right->setDOF(new_dof, dof);
                     icart_right->setInTargetTol(0.005);
                     icart_right->setLimits(0, 0.0, 15.0);
-                    
+
                     icart_right->getPose(home_pos_right, home_orie_right);
                 }
             }
@@ -293,7 +293,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         if (pose_count < poses_layout.size())
         {
             yInfo() << log_ID << " Next pose to be executed: no. : "<< pose_count << ", value: " << poses_layout[pose_count].toString();
-	    yInfo() << log_ID << "In matrix form : " << axis2dcm(poses_layout[pose_count].subVector(3,6)).toString();
+            yInfo() << log_ID << "In matrix form : " << axis2dcm(poses_layout[pose_count].subVector(3,6)).toString();
             return poses_layout[pose_count];
         }
         else
@@ -395,6 +395,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         //Vector hand_pose(7,0.0);
         //Vector *hand_marker_pose = &hand_pose;
 
+        Time::delay(1.0);
+
         if (hand_marker_pose != NULL)
         {
             pos = hand_marker_pose->subVector(3,6);
@@ -406,7 +408,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             // Look in front again
             Vector in_front(3,0.0);
             in_front(0) = -0.5;
-            in_front(2) = 0.35;
+            in_front(2) = 0.0;
             igaze->lookAtFixationPointSync(in_front);
             igaze->waitMotionDone();
 
@@ -429,8 +431,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "save_reached_poses";
 
-        //if (reached_poses.size() == poses_layout.size())
-        if (1)
+        if (reached_poses.size() == poses_layout.size())
         {
             pugi::xml_document reched_poses_file;
             pugi::xml_node root = reched_poses_file.append_child("Scene");
@@ -550,8 +551,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                             {
                                 if (j == 3 && i < 3)
                                     transform(i,j)=attr.as_double()/1000.0;
-				else
-				    transform(i,j)=attr.as_double();
+                                else
+                                    transform(i,j)=attr.as_double();
                                 j++;
                             }
 
@@ -621,9 +622,6 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 position_omog.setSubvector(0,poses_layout[i].subVector(0,2));
 
                 Vector new_position = marker_pose_matrix * position_omog;
-
-                yDebug() << "Test " << poses_layout[i].subVector(0,2).toString();
-                yDebug() << "Test " << (marker_pose_matrix.submatrix(0,2,0,2) * poses_layout[i].subVector(0,2)).toString();
 
                 poses_layout[i].setSubvector(0, new_position.subVector(0,2));
                 poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));

@@ -75,9 +75,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         file_layout = rf.check("file-layout", Value("layout_0.xml")).asString();
         reached_poses_file = rf.check("file-reached-poses", Value("test.xml")).asString();
 
-	yDebug() << "======================";
-	yDebug() << "file layout " << file_layout;
-	yDebug() << "reached_poses_file" << reached_poses_file;
+        yDebug() << "======================";
+        yDebug() << "file layout " << file_layout;
+        yDebug() << "reached_poses_file" << reached_poses_file;
 
         // Read robot name
         if(!rf.check("robot"))
@@ -257,7 +257,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         if (pose_count < poses_layout.size())
         {
             yInfo() << log_ID << " Next pose to be executed: no. : "<< pose_count << ", value: " << poses_layout[pose_count].toString();
-	    yInfo() << log_ID << "In matrix form : " << axis2dcm(poses_layout[pose_count].subVector(3,6)).toString();
+            yInfo() << log_ID << "In matrix form : " << axis2dcm(poses_layout[pose_count].subVector(3,6)).toString();
             return poses_layout[pose_count];
         }
         else
@@ -332,8 +332,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     {
         string log_ID = "save_reached_poses";
 
-        //if (reached_poses.size() == poses_layout.size())
-        if (1)
+        if (reached_poses.size() == poses_layout.size())
         {
             pugi::xml_document reached_poses_doc;
             pugi::xml_node root = reached_poses_doc.append_child("Scene");
@@ -452,10 +451,10 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                             for (pugi::xml_attribute attr = row.first_attribute(); attr; attr = attr.next_attribute())
                             {
-				if (j == 3 && i < 3)
+                                if (j == 3 && i < 3)
                                     transform(i,j)=attr.as_double()/1000.0;
-				else
-				    transform(i,j)=attr.as_double();
+                                else
+                                    transform(i,j)=attr.as_double();
                                 j++;
                             }
 
@@ -520,7 +519,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             yInfo() << log_ID << "Received marker pose (Vector): " << marker_pose->toString();
             yInfo() << log_ID << "Received marker pose (Matrix): " << marker_pose_matrix.toString();
 
-	    yInfo() << log_ID << "Poses in robot frame :";
+            yInfo() << log_ID << "Poses in robot frame :";
 
             for (size_t i = 0 ; i < poses_layout.size() ; i++)
             {
@@ -531,7 +530,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
                 poses_layout[i].setSubvector(0, new_position.subVector(0,2));
                 poses_layout[i].setSubvector(3, dcm2axis(marker_pose_matrix.submatrix(0,2,0,2) * axis2dcm(poses_layout[i].subVector(3,6)).submatrix(0,2,0,2)));
-		yInfo() << log_ID << poses_layout[i].toString();
+                yInfo() << log_ID << poses_layout[i].toString();
             }
 
             return true;
