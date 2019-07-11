@@ -36,11 +36,11 @@ class ArucoPoseEstimation : public RFModule
     // Aruco Dictionary
     string dictionary_string;
     // Switch between board and marker estimate poses
-    bool use_board;
+    bool use_board, found_dorso, found_side;
     // Number of markers in the board
     int n_markers_x, n_markers_y;
     // Marker id
-    int marker_id;
+    int marker_id_dorso, marker_id_side;
     // Dimensions and separation of markers in the board
     double marker_length, marker_separation;
 
@@ -84,7 +84,11 @@ public:
         marker_length = rf.check("marker_length", Value(0.05)).asDouble();
         marker_separation = rf.check("marker_separation", Value(0.038)).asDouble();
         use_board = rf.check("use_board", Value(true)).asBool();
-	marker_id = rf.check("marker_id", Value(65)).asInt();
+	marker_id_dorso = rf.check("marker_id_dorso", Value(65)).asInt();
+	marker_id_side = rf.check("marker_id_side", Value(65)).asInt();
+
+	found_dorso = false;
+	found_side = false;
 
         yInfo() << "=====================================";
         yInfo() << "eye_name " << eye_name;
@@ -94,7 +98,8 @@ public:
         yInfo() << "marker_separation " << marker_separation;
         yInfo() << "dictionary_string " << dictionary_string;
 	yInfo() << "use_board " << use_board;
-	yInfo() << "marker_id " << marker_id;
+	yInfo() << "marker_id_dorso " << marker_id_dorso;
+	yInfo() << "marker_id_side " << marker_id_side;
         yInfo() << "=====================================";
 
         gaze = new::GazeController(port_prefix);
@@ -203,6 +208,9 @@ public:
         image_out = *image_in;
         cv::Mat image = yarp::cv::toCvMat(image_out);
 
+	found_dorso = false;
+        found_side = false;
+
         // Perform marker detection
         std::vector<int> ids;
         std::vector<std::vector<cv::Point2f> > corners, rejected;
@@ -213,9 +221,19 @@ public:
         cv::aruco::detectMarkers(image, dictionary, corners, ids, parameters, rejected);
 	for (size_t i = 0; i< ids.size(); i++)
 	{
-	    if (ids[i] == marker_id)
+	    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
 	    {
     		valid = 1;
+		if (ids[i] == marker_id_dorso)
+		{
+		    found_dorso = true;
+		    break;
+		}
+		else
+		{
+		    found_side = true;
+		    break;
+		}
 	    }
 	    else
 		valid = 0;
@@ -249,7 +267,7 @@ public:
             {
                 for (size_t i = 0; i < ids.size(); i++)
 		{
-		    if (ids[i] == marker_id)
+		    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
 		    {
                     	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
 		    	rvec = rvecs[i];
@@ -284,18 +302,36 @@ public:
 
 	if (use_board == false)
 	{
-		Vector direction(3,0.0);
-		direction = att_wrt_cam_yarp.subcol(0,0,3);
-		direction /= norm(direction);
-		pos_wrt_cam+= 0.03 * direction;
+		if (found_dorso)
+		{
+			Vector direction(3,0.0);
+			direction = att_wrt_cam_yarp.subcol(0,0,3);
+			direction /= norm(direction);
+			pos_wrt_cam+= 0.03 * direction;
 
-		direction = att_wrt_cam_yarp.subcol(0,1,3);
-		direction /= norm(direction);
-		pos_wrt_cam += 0.01 * direction;
+			direction = att_wrt_cam_yarp.subcol(0,1,3);
+			direction /= norm(direction);
+			pos_wrt_cam += 0.0 * direction;
 
-		direction = att_wrt_cam_yarp.subcol(0,2,3);
-		direction /= norm(direction);
-		pos_wrt_cam -= 0.05 * direction;
+			direction = att_wrt_cam_yarp.subcol(0,2,3);
+			direction /= norm(direction);
+			pos_wrt_cam -= 0.05 * direction;
+		}
+		else if (found_side == true)
+		{
+			Vector direction(3,0.0);
+			direction = att_wrt_cam_yarp.subcol(0,0,3);
+			direction /= norm(direction);
+			pos_wrt_cam+= 0.03 * direction;
+
+			direction = att_wrt_cam_yarp.subcol(0,1,3);
+			direction /= norm(direction);
+			pos_wrt_cam += 0.02 * direction;
+
+			direction = att_wrt_cam_yarp.subcol(0,2,3);
+			direction /= norm(direction);
+			pos_wrt_cam -= 0.025 * direction;
+		}
 	}
 	else
 	{
@@ -311,7 +347,16 @@ public:
         tvec_translated[1] = pos_wrt_cam[1];
         tvec_translated[2] = pos_wrt_cam[2];
 
-	if (use_board == false)
+	if (use_board == false && found_dorso == true)
+	{
+		Matrix R_around_x(3,3);
+		R_around_x.zero();
+		R_around_x(0,0) = 1.0;
+		R_around_x(1,1) = -1.0;
+		R_around_x(2,2) = -1.0;
+		att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
+	}
+	else if  (use_board == false && found_side == true)
 	{
 		Matrix R_around_x(3,3);
 		R_around_x.zero();
@@ -320,7 +365,6 @@ public:
 		R_around_x(2,1) = -1.0;
 		att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
 	}
-
 	cv::Vec3d rvec_rotated;
 	cv::Mat att_wrt_cam_cv_rot(cv::Size(3,3), CV_64FC1);
 	for (size_t i=0; i<3; i++)
@@ -341,7 +385,12 @@ public:
 	    }
 	    else if (valid > 0)
 	    {
-		cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_rotated, tvec, 0.1);	
+		for (size_t i=0; i< ids.size(); i++)
+		{
+			if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+				cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.1);	
+		}
+		cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_rotated, tvec_translated, 0.1);	
 	    }
 
 	    cv::cvtColor(image, image, cv::COLOR_RGB2BGR);	

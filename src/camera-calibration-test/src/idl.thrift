@@ -43,6 +43,8 @@
 
      bool increase_pose();
 
+     bool decrease_pose();
+
      bool save_reached_poses();
 
  }

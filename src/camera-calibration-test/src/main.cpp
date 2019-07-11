@@ -286,6 +286,25 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     }
 
     /****************************************************************/
+    bool decrease_pose()
+    {
+        string log_ID = "[decrease_pose]";
+
+        pose_count--;
+
+        if (pose_count > -1)
+        {
+            yInfo() << log_ID << "Pose no. " << pose_count;
+            return true;
+        }
+        else
+        {
+            yInfo() << log_ID << "Already at the first pose" ;
+            return false;
+        }
+    }
+
+    /****************************************************************/
     Vector ask_new_pose()
     {
         string log_ID = "[ask_new_pose]";
@@ -386,6 +405,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         string log_ID = "[getPoseFromMarker]";
 
         // Look hand with gazecontroller
+	igaze->clearNeckRoll();
+	igaze->clearNeckYaw();
+
         igaze->lookAtFixationPointSync(position_from_cartesian);
         igaze->waitMotionDone();
 
@@ -399,11 +421,14 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
         if (hand_marker_pose != NULL)
         {
-            pos = hand_marker_pose->subVector(3,6);
-            orie = hand_marker_pose->subVector(0,2);
+            pos = hand_marker_pose->subVector(0,2);
+            orie = hand_marker_pose->subVector(3,6);
 
             yInfo() << log_ID << "Received marker pose (Position): " << pos.toString();
             yInfo() << log_ID << "Received marker pose (Orientation): " << orie.toString();
+
+	    igaze->blockNeckRoll(0.0);
+	    igaze->blockNeckYaw(0.0);
 
             // Look in front again
             Vector in_front(3,0.0);
