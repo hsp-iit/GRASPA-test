@@ -353,27 +353,36 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
         grasp_pose_port.write(cmd, reply);
 
-        if (reply.size() > 0)
-        {
-            grasp_pose.resize(7,0.0);
-            Bottle *list_values = reply.get(0).asList();
+	if (reply.get(0).asString() != "nack")
+	{
+		if (reply.size() > 0)
+		{
+		    yDebug() << reply.toString();
+		    grasp_pose.resize(7,0.0);
+		    Bottle *list_values = reply.get(0).asList();
 
-            for (size_t i = 0; i < list_values->size(); i++)
-            {
-                grasp_pose[i] = list_values->get(i).asDouble();
-            }
+		    for (size_t i = 0; i < list_values->size(); i++)
+		    {
+		        grasp_pose[i] = list_values->get(i).asDouble();
+		    }
 
-            yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
+		    yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
 
-            can_grasp = true;
-            return true;
-        }
-        else
-        {
-            yError() << log_ID << "Grasp pose not received!";
-            can_grasp = false;
-            return false;
-        }
+		    can_grasp = true;
+		    return true;
+		}
+		else
+		{
+		    yError() << log_ID << "Grasp pose not received!";
+		    can_grasp = false;
+		    return false;
+		}
+	}
+	else
+	{
+		yError() << log_ID << "Reply from grasp processore module is nack!";
+		return false;
+	}
     }
 
     /****************************************************************/
