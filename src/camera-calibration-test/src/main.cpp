@@ -471,7 +471,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 pugi::xml_node object = root.append_child("ManipulationObject");
                 object.append_attribute("name") = ("Reachable_frame"+string_j+string_i).c_str();
                 pugi::xml_node file = object.append_child("File");
-                file.set_value("objects/frame.xml");
+                file.text().set("objects/frame.xml");
                 pugi::xml_node global_pose = object.append_child("GlobalPose");
                 pugi::xml_node transform = global_pose.append_child("Transform");
                 pugi::xml_node matrix = transform.append_child("Matrix4x4");
