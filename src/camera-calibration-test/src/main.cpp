@@ -523,7 +523,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 }
             }
 
-            string reached_poses_file_count = reached_poses_file + to_string(count_str);
+            string reached_poses_file_count = reached_poses_file + to_string(count_str) + ".xml";
             reached_poses_doc.save_file(reached_poses_file_count.c_str());
 
             yInfo() << log_ID << "Poses saved in file: " << reached_poses_file_count;
