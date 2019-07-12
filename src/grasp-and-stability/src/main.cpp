@@ -152,14 +152,6 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                 {
                     left_arm_client.view(icart_left);
 
-                    Vector dof;
-                    icart_left->getDOF(dof);
-                    Vector new_dof(10, 1);
-                    new_dof(1) = 0.0;
-                    icart_left->setDOF(new_dof, dof);
-                    icart_left->setInTargetTol(0.005);
-                    icart_left->setLimits(0, 0.0, 15.0);
-
                     icart_left->getPose(home_pos_left, home_orie_left);
                 }
             }
@@ -176,15 +168,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                 }
                 else
                 {
-                    right_arm_client.view(icart_right);
-                    Vector dof;
-                    icart_right->getDOF(dof);
-                    Vector new_dof(10, 1);
-                    new_dof(1) = 0.0;
-                    icart_right->setDOF(new_dof, dof);
-                    icart_right->setInTargetTol(0.005);
-                    icart_right->setLimits(0, 0.0, 15.0);
-
+	            right_arm_client.view(icart_right);
                     icart_right->getPose(home_pos_right, home_orie_right);
                 }
             }
@@ -591,17 +575,51 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             {
                 if (moving_arm == "left")
                 {
+		    int context_0;
+		    icart_left->storeContext(&context_0);
+
+                    yInfo() << log_ID << " Storing old context of cartesian and setting new parameters...";
+
+		    Vector dof;
+                    icart_left->getDOF(dof);
+                    Vector new_dof(10, 1);
+                    new_dof(1) = 0.0;
+                    icart_left->setDOF(new_dof, dof);
+                    icart_left->setInTargetTol(0.005);
+                    icart_left->setLimits(0, 0.0, 25.0);
+
                     yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << "and orientation: " << t.subVector(3,6).toString();
                     icart_left->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
                     icart_left->waitMotionDone(0.4, 4.0);
+
+                    icart_left->restoreContext(context_0);   
+  
+                    yInfo() << log_ID << " Restored context of cartesian";
                 }
                 else if (moving_arm == "right")
                 {
+                    int context_0;
+		    icart_right->storeContext(&context_0);
+
+                    yInfo() << log_ID << " Storing old context of cartesian and setting new parameters...";
+
+		    Vector dof;
+                    icart_right->getDOF(dof);
+                    Vector new_dof(10, 1);
+                    new_dof(1) = 0.0;
+                    icart_right->setDOF(new_dof, dof);
+                    icart_right->setInTargetTol(0.005);
+                    icart_right->setLimits(0, 0.0, 25.0);
+
                     yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << t.subVector(3,6).toString();
                     icart_right->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
                     icart_right->waitMotionDone(0.4, 4.0);
+
+		    icart_right->restoreContext(context_0);   
+  
+                    yInfo() << log_ID << " Restored context of cartesian";
                 }
                 count ++;
             }
