@@ -157,7 +157,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
                     icart_left->setDOF(new_dof, dof);
-                    icart_left->setInTargetTol(0.001);
+                    icart_left->setInTargetTol(0.005);
                     icart_left->setLimits(0, 0.0, 15.0);
 
                     icart_left->getPose(home_pos_left, home_orie_left);
@@ -182,7 +182,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
                     icart_right->setDOF(new_dof, dof);
-                    icart_right->setInTargetTol(0.001);
+                    icart_right->setInTargetTol(0.005);
                     icart_right->setLimits(0, 0.0, 15.0);
 
                     icart_right->getPose(home_pos_right, home_orie_right);
@@ -594,14 +594,14 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                     yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << "and orientation: " << t.subVector(3,6).toString();
                     icart_left->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
-                    icart_left->waitMotionDone(0.4);
+                    icart_left->waitMotionDone(0.4, 4.0);
                 }
                 else if (moving_arm == "right")
                 {
                     yInfo() << log_ID << "Going to pose No." << count << " with position: " << t.subVector(0,2).toString();
                     yInfo() << log_ID << "                   and orientation: " << t.subVector(3,6).toString();
                     icart_right->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
-                    icart_right->waitMotionDone(0.4);
+                    icart_right->waitMotionDone(0.4, 4.0);
                 }
                 count ++;
             }
@@ -610,13 +610,13 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool home(const string &arm)
+    bool home()
     {
         string log_ID = "[home]";
 
         Bottle cmd, reply;
         cmd.addVocab(Vocab::encode("home"));
-        cmd.addVocab(Vocab::encode("hands"));
+        cmd.addVocab(Vocab::encode("all"));
         action_render_rpc.write(cmd, reply);
         bool cmd_success = (reply.get(0).asVocab() == Vocab::encode("ack"));
 
