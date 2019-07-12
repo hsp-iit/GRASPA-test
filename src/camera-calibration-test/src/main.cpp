@@ -405,8 +405,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         string log_ID = "[getPoseFromMarker]";
 
         // Look hand with gazecontroller
-	igaze->clearNeckRoll();
-	igaze->clearNeckYaw();
+        igaze->clearNeckRoll();
+        igaze->clearNeckYaw();
 
         igaze->lookAtFixationPointSync(position_from_cartesian);
         igaze->waitMotionDone();
@@ -427,8 +427,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
             yInfo() << log_ID << "Received marker pose (Position): " << pos.toString();
             yInfo() << log_ID << "Received marker pose (Orientation): " << orie.toString();
 
-	    igaze->blockNeckRoll(0.0);
-	    igaze->blockNeckYaw(0.0);
+            igaze->blockNeckRoll(0.0);
+            igaze->blockNeckYaw(0.0);
 
             // Look in front again
             Vector in_front(3,0.0);
@@ -474,7 +474,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 file.set_value("objects/frame.xml");
                 pugi::xml_node global_pose = object.append_child("GlobalPose");
                 pugi::xml_node transform = global_pose.append_child("Transform");
-                pugi::xml_node matrix = transform.append_child("Matrix");
+                pugi::xml_node matrix = transform.append_child("Matrix4x4");
 
                 Matrix R = axis2dcm(reached_poses[i].subVector(3,6));
 

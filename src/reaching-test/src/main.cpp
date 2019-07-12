@@ -350,7 +350,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 file.text().set("objects/frame.xml");
                 pugi::xml_node global_pose = object.append_child("GlobalPose");
                 pugi::xml_node transform = global_pose.append_child("Transform");
-                pugi::xml_node matrix = transform.append_child("Matrix");
+                pugi::xml_node matrix = transform.append_child("Matrix4x4");
 
                 // TODO tO CHECK CORRECTNESS
                 Vector reached_pose_om(4,1.0);
