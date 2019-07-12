@@ -36,6 +36,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     string port_prefix;
     string file_layout;
     string reached_poses_file;
+    int count_str;
     string port_marker_pose_out;
     int pose_count;
     string scene_name;
@@ -164,6 +165,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     icart_right->getPose(home_pos_right, home_orie_right);
                 }
             }
+
+            count_str = 0;
 
             Property option;
             option.put("device","gazecontrollerclient");
@@ -458,8 +461,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
         if (reached_poses.size() == poses_layout.size())
         {
-            pugi::xml_document reched_poses_file;
-            pugi::xml_node root = reched_poses_file.append_child("Scene");
+            pugi::xml_document reached_poses_doc;
+            pugi::xml_node root = reached_poses_doc.append_child("Scene");
             root.append_attribute("name") = scene_name.c_str();
 
             int j = 0;
@@ -520,9 +523,12 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 }
             }
 
-            reched_poses_file.save_file(reached_poses_file.c_str());
+            string reached_poses_file_count = reached_poses_file + to_string(count_str);
+            reached_poses_doc.save_file(reached_poses_file_count.c_str());
 
-            yInfo() << log_ID << "Poses saved in file: " << reached_poses_file;
+            yInfo() << log_ID << "Poses saved in file: " << reached_poses_file_count;
+
+            count_str++;
 
             return true;
         }

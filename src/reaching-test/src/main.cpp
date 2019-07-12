@@ -32,6 +32,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     string port_prefix;
     string file_layout;
     string reached_poses_file;
+    int count_str;
     string port_marker_pose_out;
     int pose_count;
     string scene_name;
@@ -158,6 +159,8 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 }
             }
         }
+
+        count_str = 0;
 
         // Open rpc port
         user_rpc.open("/" + port_prefix + "/cmd:rpc");
@@ -397,9 +400,12 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                 }
             }
 
-            reached_poses_doc.save_file(reached_poses_file.c_str());
+            string reached_poses_file_count = reached_poses_file + to_string(count_str);
+            reached_poses_doc.save_file(reached_poses_file_count.c_str());
 
-            yInfo() << log_ID << "Poses saved in file: " << reached_poses_file;
+            yInfo() << log_ID << "Poses saved in file: " << reached_poses_file_count;
+
+            count_str++;
 
             return true;
         }
