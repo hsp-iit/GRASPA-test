@@ -18,6 +18,7 @@
 #include <yarp/cv/Cv.h>
 
 #include <GazeController.h>
+#include "src/ArucoPoseEstimation_IDL.h"
 
 using namespace yarp::os;
 using namespace yarp::sig;
@@ -27,7 +28,7 @@ using namespace yarp::cv;
 using namespace std;
 
 /****************************************************************/
-class ArucoPoseEstimation : public RFModule
+class ArucoPoseEstimation : public RFModule, ArucoPoseEstimation_IDL
 {
     // Camera name
     string eye_name;
@@ -47,6 +48,8 @@ class ArucoPoseEstimation : public RFModule
     // Choose if to show image with the estimated pose
     bool send_image;
 
+bool side_calibrated;
+
     // Matrix from marker on dorso to hand frame
     Matrix from_dorso_to_frame;
     // Matrix from marker on side to frame
@@ -60,6 +63,9 @@ class ArucoPoseEstimation : public RFModule
 
     // A library with high level interface to iKinGazeCtrl
     GazeController *gaze;
+
+    // Port for thrift services
+    RpcServer user_rpc;
 
     // Camera data
     cv::Mat cam_intrinsic;
@@ -108,6 +114,12 @@ public:
         yInfo() << "=====================================";
 
         gaze = new::GazeController(port_prefix);
+
+        //  attach callback
+        attach(user_rpc);
+
+        // Open rpc port
+        user_rpc.open("/" + port_prefix + "/cmd:rpc");
 
         // Open camera  input port
         if(!port_image_in.open("/" + port_prefix + "/cam/" + eye_name + ":i"))
@@ -169,18 +181,21 @@ public:
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
         from_dorso_to_frame.resize(4,4);
-        from_dorso_to_frame.eye();
+        from_dorso_to_frame.zero();
 
+        from_dorso_to_frame(0,0) = 1.0;
         from_dorso_to_frame(1,1) = -1.0;
         from_dorso_to_frame(2,2) = -1.0;
-        from_dorso_to_frame(0,3) = 0.03;
-        from_dorso_to_frame(1,3) = -0.0;
+        from_dorso_to_frame(0,3) = -0.03;
+        from_dorso_to_frame(1,3) = 0.0;
         from_dorso_to_frame(2,3) = 0.05;
+	from_dorso_to_frame(3,3) = 1.0;
 
         yInfo () << log_ID_ << "Matrix from dorso marker to hand frame:";
-        yInfo() << log_ID_ << from_side_to_frame.toString();
+        yInfo() << log_ID_ << from_dorso_to_frame.toString();
 
         yError() << log_ID_ << "Matrix from side marker to hand frame needs to be calibrated!";
+	side_calibrated = false;
 
         from_side_to_frame.resize(4,4);
         from_side_to_frame(3,3) = 1;
@@ -189,6 +204,12 @@ public:
         board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, static_cast<float>(marker_length), static_cast<float>(marker_separation), dictionary);
 
         return true;
+    }
+
+    /*****************************************************************/
+    bool attach(RpcServer &source)
+    {
+       return this->yarp().attachAsServer(source);
     }
 
     /****************************************************************/
@@ -251,7 +272,7 @@ public:
         	    found_dorso = true;
         	    break;
         	}
-        	else
+        	else if (side_calibrated == true)
         	{
         	    found_side = true;
         	    break;
@@ -289,12 +310,24 @@ public:
             {
                 for (size_t i = 0; i < ids.size(); i++)
                 {
-                    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
-                    {
-                    	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
-                    	rvec = rvecs[i];
-                    	tvec = tvecs[i];
-                    }
+	            if (side_calibrated == false)
+	            {
+		            if (ids[i] == marker_id_dorso)
+		            {
+		            	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
+		            	rvec = rvecs[i];
+		            	tvec = tvecs[i];
+		            }
+		     }
+		     else
+	             {
+			    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+		            {
+		            	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
+		            	rvec = rvecs[i];
+		            	tvec = tvecs[i];
+		            }
+                     }
                 }
             }
             else
@@ -326,23 +359,40 @@ public:
         {
         	if (found_dorso == true)
         	{
-                Vector pos_omog_coord(4,1.0);
-                pos_omog_coord.setSubvector(0, pos_wrt_cam);
 
-                pos_wrt_cam = (from_dorso_to_frame * pos_omog_coord).subVector(0,2);
+			Vector direction(3,0.0);
+			direction = att_wrt_cam_yarp.subcol(0,0,3);
+			direction /= norm(direction);
+			pos_wrt_cam+= 0.03 * direction;
 
-                att_wrt_cam_yarp = att_wrt_cam_yarp * from_dorso_to_frame.submatrix(0,2,0,2);
+			direction = att_wrt_cam_yarp.subcol(0,1,3);
+			direction /= norm(direction);
+			pos_wrt_cam += 0.0 * direction;
+
+			direction = att_wrt_cam_yarp.subcol(0,2,3);
+			direction /= norm(direction);
+			pos_wrt_cam -= 0.05 * direction;
+
+			Matrix R_around_x(3,3);
+			R_around_x.zero();
+			R_around_x(0,0) = 1.0;
+			R_around_x(1,1) = -1.0;
+			R_around_x(2,2) = -1.0;
+			att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
 
         	}
-            else
-            {
-                Vector pos_omog_coord(4,1.0);
-                pos_omog_coord.setSubvector(0, pos_wrt_cam);
+	    else if (found_side == true && side_calibrated == true)
+	    {
+	        Matrix pos_omog_coord(4,4);
+		pos_omog_coord.eye();
+	        pos_omog_coord.setSubcol(pos_wrt_cam, 0, 3);
+                pos_omog_coord.setSubmatrix(att_wrt_cam_yarp, 0,0);
 
-                pos_wrt_cam = (from_side_to_frame * pos_omog_coord).subVector(0,2);
+	        pos_wrt_cam = (pos_omog_coord * from_side_to_frame).subcol(0,3,3);
 
-                att_wrt_cam_yarp = att_wrt_cam_yarp * from_side_to_frame.submatrix(0,2,0,2);
-            }
+
+	        att_wrt_cam_yarp = att_wrt_cam_yarp * from_side_to_frame.submatrix(0,2,0,2);
+	    }
 
         }
         else
@@ -359,26 +409,7 @@ public:
         tvec_translated[1] = pos_wrt_cam[1];
         tvec_translated[2] = pos_wrt_cam[2];
 
-        // if (use_board == false && found_dorso == true)
-        // {
-        // 	Matrix R_around_x(3,3);
-        // 	R_around_x.zero();
-        // 	R_around_x(0,0) = 1.0;
-        // 	R_around_x(1,1) = -1.0;
-        // 	R_around_x(2,2) = -1.0;
-        // 	att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
-        // }
-        // else if  (use_board == false && found_side == true)
-        // {
-        //     Vector pos_omg(4,1.0);
-        //     pos_omg.setSubvector(0, pos_wrt_cam);
-        //
-        //     yDebug() << "pose_wrt_cam side " << pos_wrt_cam.toString();
-        //     pos_wrt_cam.setSubvector(0, (from_side_to_frame * pos_omg).subVector(0,2));
-        //     yDebug() << "pos_wrt_cam side translated " << pos_wrt_cam.toString();
-        // 	att_wrt_cam_yarp = att_wrt_cam_yarp * from_side_to_frame.submatrix(0,2,0,2);
-        //     yDebug() << "pos_wrtatt_wrt_cam_yarp_cam side rotated " << att_wrt_cam_yarp.toString();
-        // }
+
         cv::Vec3d rvec_rotated;
         cv::Mat att_wrt_cam_cv_rot(cv::Size(3,3), CV_64FC1);
         for (size_t i=0; i<3; i++)
@@ -411,6 +442,10 @@ public:
 
             port_image_out.write(false);
         }
+
+	yError() ;
+yError() << "FOUND SIZE " << found_side;
+yError() << "CALIBRATE SIDE " << side_calibrated;
 
 
         Matrix marker_transform(4,4);
@@ -451,7 +486,10 @@ public:
         image_in = port_image_in.read(true);
 
         if (image_in == nullptr)
+	{
+	    yError() << log_ID << "No image received!";
             return false;
+	}
 
         // Prepare output image
         ImageOf<PixelRgb>& image_out = port_image_out.prepare();
@@ -482,7 +520,10 @@ public:
         }
 
         if (!(found_dorso == true && found_side == true))
+	{
+	    yError() << log_ID << "No marker detected!";
             return false;
+	}
 
         cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
 
@@ -526,7 +567,10 @@ public:
         Matrix camera_transform(4,4);
         valid_camera_pose = getCameraPose(camera_transform);
         if (!valid_camera_pose)
+	{
+	    yError() << log_ID << "No valid camera pose!";
             return false;
+	}
 
         // Compose dorso marker pose
         Vector pos_wrt_cam_dorso(3);
@@ -557,22 +601,46 @@ public:
                 att_wrt_cam_yarp_side(i, j) = att_wrt_cam_cv_side.at<double>(i, j);
 
         // Reconstruct hand frame using dorso info and its rototranslation
-        Vector pos_hand_frame(3);
-        Vector pos_omog_coord(4,1.0);
-        pos_omog_coord.setSubvector(0, pos_wrt_cam_dorso);
+	//Matrix pos_omog_coord(4,4);
+	//pos_omog_coord.eye();
+        //pos_omog_coord.setSubcol(pos_wrt_cam_dorso, 0, 3);
 
-        pos_hand_frame = (from_dorso_to_frame * pos_omog_coord).subVector(0,2);
+	Vector pos_hand_frame(3);
+        //pos_hand_frame = (pos_omog_coord * from_dorso_to_frame).subcol(0,3,3);
 
-        Matrix att_yarp_hand_frame(3,3);
-        att_yarp_hand_frame = att_wrt_cam_yarp_dorso * from_dorso_to_frame.submatrix(0,2,0,2);
+	Matrix att_yarp_hand_frame(3,3);
+        //att_yarp_hand_frame = att_wrt_cam_yarp_dorso * from_dorso_to_frame.submatrix(0,2,0,2);
+
+        Vector direction(3,0.0);
+	direction = att_wrt_cam_yarp_dorso.subcol(0,0,3);
+	direction /= norm(direction);
+	pos_hand_frame+= 0.03 * direction;
+
+	direction = att_wrt_cam_yarp_dorso.subcol(0,1,3);
+	direction /= norm(direction);
+	pos_hand_frame += 0.0 * direction;
+
+	direction = att_wrt_cam_yarp_dorso.subcol(0,2,3);
+	direction /= norm(direction);
+	pos_hand_frame -= 0.05 * direction;
+
+	Matrix R_around_x(3,3);
+	R_around_x.zero();
+	R_around_x(0,0) = 1.0;
+	R_around_x(1,1) = -1.0;
+	R_around_x(2,2) = -1.0;
+	att_yarp_hand_frame = att_wrt_cam_yarp_dorso * R_around_x;
+        
 
         // This is the hand frame obtained from dorso marker
         Matrix hand_frame(4,4);
+	hand_frame(3,3) = 1.0;
         hand_frame.setSubmatrix(att_yarp_hand_frame, 0 ,0);
         hand_frame.setSubcol(pos_hand_frame, 0, 3);
 
         // Side marker pose
         Matrix homog_side_marker(4,4);
+	homog_side_marker(3,3) = 1.0;
         homog_side_marker.setSubmatrix(att_wrt_cam_yarp_side, 0, 0);
         homog_side_marker.setSubcol(pos_wrt_cam_side, 0, 3);
 
@@ -591,7 +659,7 @@ public:
         tvec_hand_from_dorso(2) = pos_hand_frame(2);
 
         cv::Mat rvec_hand_from_dorso;
-        cv::Mat att_cv_hand_frame_dorso;
+        cv::Mat att_cv_hand_frame_dorso(cv::Size(3,3), CV_64FC1);
 
         for (size_t i=0; i<3; i++)
         {
@@ -600,7 +668,7 @@ public:
                 att_cv_hand_frame_dorso.at<double>(i, j) = hand_frame(i, j);
             }
         }
-        cv::Rodrigues(rvec_hand_from_dorso, att_cv_hand_frame_dorso);
+        cv::Rodrigues(att_cv_hand_frame_dorso, rvec_hand_from_dorso);
 
         // To check if it was correct
         // Compute quantities from side
@@ -614,7 +682,7 @@ public:
         tvec_hand_from_side(2) = homog_hand_from_side(2,3);
 
         cv::Mat rvec_hand_from_side;
-        cv::Mat att_cv_hand_from_side;
+        cv::Mat att_cv_hand_from_side(cv::Size(3,3), CV_64FC1);
 
         for (size_t i=0; i<3; i++)
         {
@@ -624,16 +692,20 @@ public:
                 }
         }
 
-        cv::Rodrigues(rvec_hand_from_side, att_cv_hand_from_side);
+        cv::Rodrigues(att_cv_hand_from_side, rvec_hand_from_side);
 
         // Show everything
         if (send_image)
         {
-    	    cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_side, tvec_side, 0.05);
+	    if (side_calibrated == true)
+    	         cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_side, tvec_side, 0.05);
+
             cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_dorso, tvec_dorso, 0.05);
 
             cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_hand_from_dorso, tvec_hand_from_dorso, 0.1);
-            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_hand_from_side, tvec_hand_from_side, 0.1);
+	    
+	    if (side_calibrated == true)
+            	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_hand_from_side, tvec_hand_from_side, 0.1);
 
             cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
 
@@ -645,6 +717,8 @@ public:
 
         yInfo() << log_ID << "Hand pose from dorso:";
         yInfo() << log_ID << (camera_transform * hand_frame).toString();
+
+	side_calibrated = true;
 
         return true;
 

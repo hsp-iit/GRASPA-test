@@ -28,9 +28,10 @@ set(${EXE_TARGET_NAME}_SRC
     src/main.cpp
     )
 
+set(${EXE_TARGET_NAME}_THRIFT_HDR src/idl.thrift)
+yarp_add_idl(${EXE_TARGET_NAME}_THRIFT_SRC ${${EXE_TARGET_NAME}_THRIFT_HDR})
 
-
-add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_SRC})
+add_executable(${EXE_TARGET_NAME} ${${EXE_TARGET_NAME}_SRC} ${${EXE_TARGET_NAME}_THRIFT_SRC})
 
 target_include_directories(${EXE_TARGET_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
