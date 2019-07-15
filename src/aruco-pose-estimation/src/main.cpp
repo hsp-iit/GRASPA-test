@@ -47,6 +47,11 @@ class ArucoPoseEstimation : public RFModule
     // Choose if to show image with the estimated pose
     bool send_image;
 
+    // Matrix from marker on dorso to hand frame
+    Matrix from_dorso_to_frame;
+    // Matrix from marker on side to frame
+    Matrix from_side_to_frame;
+
     // Dictionary of the marker
     cv::Ptr<cv::aruco::Dictionary> dictionary;
 
@@ -84,11 +89,11 @@ public:
         marker_length = rf.check("marker_length", Value(0.05)).asDouble();
         marker_separation = rf.check("marker_separation", Value(0.038)).asDouble();
         use_board = rf.check("use_board", Value(true)).asBool();
-	marker_id_dorso = rf.check("marker_id_dorso", Value(65)).asInt();
-	marker_id_side = rf.check("marker_id_side", Value(65)).asInt();
+        marker_id_dorso = rf.check("marker_id_dorso", Value(65)).asInt();
+        marker_id_side = rf.check("marker_id_side", Value(65)).asInt();
 
-	found_dorso = false;
-	found_side = false;
+        found_dorso = false;
+        found_side = false;
 
         yInfo() << "=====================================";
         yInfo() << "eye_name " << eye_name;
@@ -97,9 +102,9 @@ public:
         yInfo() << "marker_length " << marker_length;
         yInfo() << "marker_separation " << marker_separation;
         yInfo() << "dictionary_string " << dictionary_string;
-	yInfo() << "use_board " << use_board;
-	yInfo() << "marker_id_dorso " << marker_id_dorso;
-	yInfo() << "marker_id_side " << marker_id_side;
+        yInfo() << "use_board " << use_board;
+        yInfo() << "marker_id_dorso " << marker_id_dorso;
+        yInfo() << "marker_id_side " << marker_id_side;
         yInfo() << "=====================================";
 
         gaze = new::GazeController(port_prefix);
@@ -163,6 +168,23 @@ public:
         else if (dictionary_string == "4x4")
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
+        from_dorso_to_frame.resize(4,4);
+        from_dorso_to_frame.eye();
+
+        from_dorso_to_frame(1,1) = -1.0;
+        from_dorso_to_frame(2,2) = -1.0;
+        from_dorso_to_frame(0,3) = 0.03;
+        from_dorso_to_frame(1,3) = -0.0;
+        from_dorso_to_frame(2,3) = 0.05;
+
+        yInfo () << log_ID_ << "Matrix from dorso marker to hand frame:";
+        yInfo() << log_ID_ << from_side_to_frame.toString();
+
+        yError() << log_ID_ << "Matrix from side marker to hand frame needs to be calibrated!";
+
+        from_side_to_frame.resize(4,4);
+        from_side_to_frame(3,3) = 1;
+
         // Create boards (with same values as the printed one)
         board = cv::aruco::GridBoard::create(n_markers_x, n_markers_y, static_cast<float>(marker_length), static_cast<float>(marker_separation), dictionary);
 
@@ -208,7 +230,7 @@ public:
         image_out = *image_in;
         cv::Mat image = yarp::cv::toCvMat(image_out);
 
-	found_dorso = false;
+        found_dorso = false;
         found_side = false;
 
         // Perform marker detection
@@ -216,28 +238,28 @@ public:
         std::vector<std::vector<cv::Point2f> > corners, rejected;
         cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
 
-	int valid = 0;
+        int valid = 0;
 
         cv::aruco::detectMarkers(image, dictionary, corners, ids, parameters, rejected);
-	for (size_t i = 0; i< ids.size(); i++)
-	{
-	    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
-	    {
-    		valid = 1;
-		if (ids[i] == marker_id_dorso)
-		{
-		    found_dorso = true;
-		    break;
-		}
-		else
-		{
-		    found_side = true;
-		    break;
-		}
-	    }
-	    else
-		valid = 0;
-	}
+        for (size_t i = 0; i< ids.size(); i++)
+        {
+            if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+            {
+        		valid = 1;
+        	if (ids[i] == marker_id_dorso)
+        	{
+        	    found_dorso = true;
+        	    break;
+        	}
+        	else
+        	{
+        	    found_side = true;
+        	    break;
+        	}
+            }
+            else
+        	valid = 0;
+        }
 
         cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
 
@@ -245,7 +267,7 @@ public:
         cv::Vec3d rvec, tvec;
 
         vector<cv::Vec3d> rvecs, tvecs;
-        
+
 
         if (use_board)
             valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
@@ -266,14 +288,14 @@ public:
             else if (valid > 0 && use_board == false)
             {
                 for (size_t i = 0; i < ids.size(); i++)
-		{
-		    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
-		    {
+                {
+                    if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+                    {
                     	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
-		    	rvec = rvecs[i];
-		    	tvec = tvecs[i];
-		    }
-		}
+                    	rvec = rvecs[i];
+                    	tvec = tvecs[i];
+                    }
+                }
             }
             else
                 yError() << "Not valid estimated board pose!";
@@ -300,100 +322,92 @@ public:
             for (size_t j=0; j<3; j++)
                 att_wrt_cam_yarp(i, j) = att_wrt_cam_cv.at<double>(i, j);
 
-	if (use_board == false)
-	{
-		if (found_dorso)
-		{
-			Vector direction(3,0.0);
-			direction = att_wrt_cam_yarp.subcol(0,0,3);
-			direction /= norm(direction);
-			pos_wrt_cam+= 0.03 * direction;
+        if (use_board == false)
+        {
+        	if (found_dorso == true)
+        	{
+                Vector pos_omog_coord(4,1.0);
+                pos_omog_coord.setSubvector(0, pos_wrt_cam);
 
-			direction = att_wrt_cam_yarp.subcol(0,1,3);
-			direction /= norm(direction);
-			pos_wrt_cam += 0.0 * direction;
+                pos_wrt_cam = (from_dorso_to_frame * pos_omog_coord).subVector(0,2);
 
-			direction = att_wrt_cam_yarp.subcol(0,2,3);
-			direction /= norm(direction);
-			pos_wrt_cam -= 0.05 * direction;
-		}
-		else if (found_side == true)
-		{
-			Vector direction(3,0.0);
-			direction = att_wrt_cam_yarp.subcol(0,0,3);
-			direction /= norm(direction);
-			pos_wrt_cam+= 0.03 * direction;
+                att_wrt_cam_yarp = att_wrt_cam_yarp * from_dorso_to_frame.submatrix(0,2,0,2);
 
-			direction = att_wrt_cam_yarp.subcol(0,1,3);
-			direction /= norm(direction);
-			pos_wrt_cam += 0.02 * direction;
+        	}
+            else
+            {
+                Vector pos_omog_coord(4,1.0);
+                pos_omog_coord.setSubvector(0, pos_wrt_cam);
 
-			direction = att_wrt_cam_yarp.subcol(0,2,3);
-			direction /= norm(direction);
-			pos_wrt_cam -= 0.025 * direction;
-		}
-	}
-	else
-	{
-		Vector direction(3,0.0);
-		direction = att_wrt_cam_yarp.subcol(0,0,3);
-		direction /= norm(direction);
-		// TODO This needs to be fixed once we now the extact position of the markers w.r.t to marker frame in simox
-		pos_wrt_cam += (marker_length * n_markers_x + marker_separation * (n_markers_x-1)) * direction;
-	}
+                pos_wrt_cam = (from_side_to_frame * pos_omog_coord).subVector(0,2);
+
+                att_wrt_cam_yarp = att_wrt_cam_yarp * from_side_to_frame.submatrix(0,2,0,2);
+            }
+
+        }
+        else
+        {
+        	Vector direction(3,0.0);
+        	direction = att_wrt_cam_yarp.subcol(0,0,3);
+        	direction /= norm(direction);
+        	// TODO This needs to be fixed once we now the extact position of the markers w.r.t to marker frame in simox
+        	pos_wrt_cam += (marker_length * n_markers_x + marker_separation * (n_markers_x-1)) * direction;
+        }
 
         cv::Vec3d tvec_translated;
         tvec_translated[0] = pos_wrt_cam[0];
         tvec_translated[1] = pos_wrt_cam[1];
         tvec_translated[2] = pos_wrt_cam[2];
 
-	if (use_board == false && found_dorso == true)
-	{
-		Matrix R_around_x(3,3);
-		R_around_x.zero();
-		R_around_x(0,0) = 1.0;
-		R_around_x(1,1) = -1.0;
-		R_around_x(2,2) = -1.0;
-		att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
-	}
-	else if  (use_board == false && found_side == true)
-	{
-		Matrix R_around_x(3,3);
-		R_around_x.zero();
-		R_around_x(0,0) = 1.0;
-		R_around_x(1,2) = 1.0;
-		R_around_x(2,1) = -1.0;
-		att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
-	}
-	cv::Vec3d rvec_rotated;
-	cv::Mat att_wrt_cam_cv_rot(cv::Size(3,3), CV_64FC1);
-	for (size_t i=0; i<3; i++)
-	{
-            for (size_t j=0; j<3; j++)
-	    {
-                att_wrt_cam_cv_rot.at<double>(i, j) = att_wrt_cam_yarp(i, j);
-            }
-	}
+        // if (use_board == false && found_dorso == true)
+        // {
+        // 	Matrix R_around_x(3,3);
+        // 	R_around_x.zero();
+        // 	R_around_x(0,0) = 1.0;
+        // 	R_around_x(1,1) = -1.0;
+        // 	R_around_x(2,2) = -1.0;
+        // 	att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
+        // }
+        // else if  (use_board == false && found_side == true)
+        // {
+        //     Vector pos_omg(4,1.0);
+        //     pos_omg.setSubvector(0, pos_wrt_cam);
+        //
+        //     yDebug() << "pose_wrt_cam side " << pos_wrt_cam.toString();
+        //     pos_wrt_cam.setSubvector(0, (from_side_to_frame * pos_omg).subVector(0,2));
+        //     yDebug() << "pos_wrt_cam side translated " << pos_wrt_cam.toString();
+        // 	att_wrt_cam_yarp = att_wrt_cam_yarp * from_side_to_frame.submatrix(0,2,0,2);
+        //     yDebug() << "pos_wrtatt_wrt_cam_yarp_cam side rotated " << att_wrt_cam_yarp.toString();
+        // }
+        cv::Vec3d rvec_rotated;
+        cv::Mat att_wrt_cam_cv_rot(cv::Size(3,3), CV_64FC1);
+        for (size_t i=0; i<3; i++)
+        {
+                for (size_t j=0; j<3; j++)
+            {
+                    att_wrt_cam_cv_rot.at<double>(i, j) = att_wrt_cam_yarp(i, j);
+                }
+        }
 
-	cv::Rodrigues(att_wrt_cam_cv_rot, rvec_rotated);
+        cv::Rodrigues(att_wrt_cam_cv_rot, rvec_rotated);
 
         if (send_image)
         {
-	    if (use_board == true && valid > 0)
-	    {
-            	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec_translated, 0.1);
-	    }
-	    else if (valid > 0)
-	    {
-		for (size_t i=0; i< ids.size(); i++)
-		{
-			if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
-				cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.1);	
-		}
-		cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_rotated, tvec_translated, 0.1);	
-	    }
+    	    if (use_board == true && valid > 0)
+    	    {
+                cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec, tvec_translated, 0.1);
+    	    }
+    	    else if (valid > 0)
+    	    {
+        		for (size_t i=0; i< ids.size(); i++)
+        		{
+        			if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+        				cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.1);
+        		}
+                cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_rotated, tvec_translated, 0.1);
+    	    }
 
-	    cv::cvtColor(image, image, cv::COLOR_RGB2BGR);	
+            cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
 
             port_image_out.write(false);
         }
@@ -424,6 +438,216 @@ public:
         port_aruco_pose_out.write();
 
         return true;
+    }
+
+    /****************************************************************/
+    bool calibrate_markers()
+    {
+        string log_ID = "[calibrate_markers]";
+
+        // Read from the camera
+        ImageOf<PixelRgb>* image_in;
+
+        image_in = port_image_in.read(true);
+
+        if (image_in == nullptr)
+            return false;
+
+        // Prepare output image
+        ImageOf<PixelRgb>& image_out = port_image_out.prepare();
+
+        // Copy input to output and wrap around a cv::Mat
+        image_out = *image_in;
+        cv::Mat image = yarp::cv::toCvMat(image_out);
+
+        found_dorso = false;
+        found_side = false;
+
+        // Perform marker detection
+        std::vector<int> ids;
+        std::vector<std::vector<cv::Point2f> > corners, rejected;
+        cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+
+        cv::aruco::detectMarkers(image, dictionary, corners, ids, parameters, rejected);
+        for (size_t i = 0; i< ids.size(); i++)
+        {
+            if (ids[i] == marker_id_dorso)
+        	{
+        	    found_dorso = true;
+        	}
+        	else
+        	{
+        	    found_side = true;
+        	}
+        }
+
+        if (!(found_dorso == true && found_side == true))
+            return false;
+
+        cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
+
+        // Estimate pose
+        cv::Vec3d rvec_side, tvec_side;
+        cv::Vec3d rvec_dorso, tvec_dorso;
+        vector<cv::Vec3d> rvecs, tvecs;
+
+        cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
+
+        if (send_image)
+        {
+            // Draw the detected markers
+            if(ids.size() > 0)
+                cv::aruco::drawDetectedMarkers(image, corners, ids);
+            // Draw the estimated pose of the board
+            for (size_t i = 0; i < ids.size(); i++)
+            {
+                if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+                {
+                	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
+
+                    if (ids[i] == marker_id_dorso)
+                    {
+                        rvec_dorso = rvecs[i];
+                    	tvec_dorso = tvecs[i];
+                    }
+
+                    if (ids[i] == marker_id_side)
+                    {
+                        rvec_side = rvecs[i];
+                    	tvec_side = tvecs[i];
+                    }
+
+                }
+            }
+        }
+
+        // Get camera pose
+        bool valid_camera_pose;
+        Matrix camera_transform(4,4);
+        valid_camera_pose = getCameraPose(camera_transform);
+        if (!valid_camera_pose)
+            return false;
+
+        // Compose dorso marker pose
+        Vector pos_wrt_cam_dorso(3);
+        pos_wrt_cam_dorso(0) = tvec_dorso(0);
+        pos_wrt_cam_dorso(1) = tvec_dorso(1);
+        pos_wrt_cam_dorso(2) = tvec_dorso(2);
+
+        cv::Mat att_wrt_cam_cv_dorso;
+        cv::Rodrigues(rvec_dorso, att_wrt_cam_cv_dorso);
+        Matrix att_wrt_cam_yarp_dorso(3, 3);
+
+        for (size_t i=0; i<3; i++)
+            for (size_t j=0; j<3; j++)
+                att_wrt_cam_yarp_dorso(i, j) = att_wrt_cam_cv_dorso.at<double>(i, j);
+
+        // Compose side marker pose
+        Vector pos_wrt_cam_side(3);
+        pos_wrt_cam_side(0) = tvec_side(0);
+        pos_wrt_cam_side(1) = tvec_side(1);
+        pos_wrt_cam_side(2) = tvec_side(2);
+
+        cv::Mat att_wrt_cam_cv_side;
+        cv::Rodrigues(rvec_side, att_wrt_cam_cv_side);
+        Matrix att_wrt_cam_yarp_side(3, 3);
+
+        for (size_t i=0; i<3; i++)
+            for (size_t j=0; j<3; j++)
+                att_wrt_cam_yarp_side(i, j) = att_wrt_cam_cv_side.at<double>(i, j);
+
+        // Reconstruct hand frame using dorso info and its rototranslation
+        Vector pos_hand_frame(3);
+        Vector pos_omog_coord(4,1.0);
+        pos_omog_coord.setSubvector(0, pos_wrt_cam_dorso);
+
+        pos_hand_frame = (from_dorso_to_frame * pos_omog_coord).subVector(0,2);
+
+        Matrix att_yarp_hand_frame(3,3);
+        att_yarp_hand_frame = att_wrt_cam_yarp_dorso * from_dorso_to_frame.submatrix(0,2,0,2);
+
+        // This is the hand frame obtained from dorso marker
+        Matrix hand_frame(4,4);
+        hand_frame.setSubmatrix(att_yarp_hand_frame, 0 ,0);
+        hand_frame.setSubcol(pos_hand_frame, 0, 3);
+
+        // Side marker pose
+        Matrix homog_side_marker(4,4);
+        homog_side_marker.setSubmatrix(att_wrt_cam_yarp_side, 0, 0);
+        homog_side_marker.setSubcol(pos_wrt_cam_side, 0, 3);
+
+        // TODO Check this
+        // This is the matrix to pass from the hand side marker to the hand frame
+        from_side_to_frame = SE3inv(homog_side_marker) * hand_frame;
+
+        yDebug() << log_ID << "from_side_to_frame (obtained during calibration):";
+        yDebug() << log_ID << from_side_to_frame.toString();
+
+        // To check if it was correct
+        // Compute quantities from dorso
+        cv::Vec3d tvec_hand_from_dorso(3);
+        tvec_hand_from_dorso(0) = pos_hand_frame(0);
+        tvec_hand_from_dorso(1) = pos_hand_frame(1);
+        tvec_hand_from_dorso(2) = pos_hand_frame(2);
+
+        cv::Mat rvec_hand_from_dorso;
+        cv::Mat att_cv_hand_frame_dorso;
+
+        for (size_t i=0; i<3; i++)
+        {
+            for (size_t j=0; j<3; j++)
+            {
+                att_cv_hand_frame_dorso.at<double>(i, j) = hand_frame(i, j);
+            }
+        }
+        cv::Rodrigues(rvec_hand_from_dorso, att_cv_hand_frame_dorso);
+
+        // To check if it was correct
+        // Compute quantities from side
+        Vector pos_hand_frame_from_side(3, 0.0);
+        Matrix homog_hand_from_side(4,4);
+        homog_hand_from_side = homog_side_marker * from_side_to_frame;
+
+        cv::Vec3d tvec_hand_from_side;
+        tvec_hand_from_side(0) = homog_hand_from_side(0,3);
+        tvec_hand_from_side(1) = homog_hand_from_side(1,3);
+        tvec_hand_from_side(2) = homog_hand_from_side(2,3);
+
+        cv::Mat rvec_hand_from_side;
+        cv::Mat att_cv_hand_from_side;
+
+        for (size_t i=0; i<3; i++)
+        {
+                for (size_t j=0; j<3; j++)
+            {
+                    att_cv_hand_from_side.at<double>(i, j) = homog_hand_from_side(i, j);
+                }
+        }
+
+        cv::Rodrigues(rvec_hand_from_side, att_cv_hand_from_side);
+
+        // Show everything
+        if (send_image)
+        {
+    	    cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_side, tvec_side, 0.05);
+            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_dorso, tvec_dorso, 0.05);
+
+            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_hand_from_dorso, tvec_hand_from_dorso, 0.1);
+            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_hand_from_side, tvec_hand_from_side, 0.1);
+
+            cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+
+            port_image_out.write(false);
+        }
+
+        yInfo() << log_ID << "Hand pose from side:";
+        yInfo() << log_ID << (camera_transform * homog_hand_from_side).toString();
+
+        yInfo() << log_ID << "Hand pose from dorso:";
+        yInfo() << log_ID << (camera_transform * hand_frame).toString();
+
+        return true;
+
     }
 
     /****************************************************************/
