@@ -366,7 +366,10 @@ public:
 			R_around_x(0,0) = 1.0;
 			R_around_x(1,1) = -1.0;
 			R_around_x(2,2) = -1.0;
+
+			
 			att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
+
 
         	}
             else if (found_side == true && side_calibrated == true)
@@ -458,6 +461,14 @@ public:
     }
 
     /****************************************************************/
+    bool reset_calibration()
+    {
+        from_side_to_frame.zero();
+        side_calibrated = false;
+	return true;
+    } 
+
+    /****************************************************************/
     bool calibrate_markers()
     {
         string log_ID = "[calibrate_markers]";
@@ -495,7 +506,7 @@ public:
         	{
         	    found_dorso = true;
         	}
-        	else
+        	else if (ids[i] == marker_id_side)
         	{
         	    found_side = true;
         	}
@@ -588,6 +599,7 @@ public:
         //pos_omog_coord.setSubcol(pos_wrt_cam_dorso, 0, 3);
 
         Vector pos_hand_frame(3);
+	pos_hand_frame = pos_wrt_cam_dorso;
         //pos_hand_frame = (pos_omog_coord * from_dorso_to_frame).subcol(0,3,3);
 
         Matrix att_yarp_hand_frame(3,3);
@@ -596,15 +608,16 @@ public:
         Vector direction(3,0.0);
     	direction = att_wrt_cam_yarp_dorso.subcol(0,0,3);
     	direction /= norm(direction);
-    	pos_hand_frame = pos_wrt_cam_dorso + 0.03 * direction;
+
+    	pos_hand_frame += 0.03 * direction;
 
     	direction = att_wrt_cam_yarp_dorso.subcol(0,1,3);
     	direction /= norm(direction);
-    	pos_hand_frame = pos_wrt_cam_dorso +  0.0 * direction;
+    	pos_hand_frame +=  0.0 * direction;
 
     	direction = att_wrt_cam_yarp_dorso.subcol(0,2,3);
     	direction /= norm(direction);
-    	pos_hand_frame = pos_wrt_cam_dorso +  0.05 * direction;
+    	pos_hand_frame -=  0.05 * direction;
 
     	Matrix R_around_x(3,3);
     	R_around_x.zero();
@@ -625,12 +638,8 @@ public:
         homog_side_marker.setSubmatrix(att_wrt_cam_yarp_side, 0, 0);
         homog_side_marker.setSubcol(pos_wrt_cam_side, 0, 3);
 
-        // TODO Check this
         // This is the matrix to pass from the hand side marker to the hand frame
         from_side_to_frame = SE3inv(homog_side_marker) * hand_frame;
-
-        yDebug() << log_ID << "from_side_to_frame (obtained during calibration):";
-        yDebug() << log_ID << from_side_to_frame.toString();
 
         // To check if it was correct
         // Compute quantities from dorso
@@ -675,6 +684,8 @@ public:
 
         cv::Rodrigues(att_cv_hand_from_side, rvec_hand_from_side);
 
+	side_calibrated = true;
+
         // Show everything
         if (send_image)
         {
@@ -698,8 +709,6 @@ public:
 
         yInfo() << log_ID << "Hand pose from dorso:";
         yInfo() << log_ID << (camera_transform * hand_frame).toString();
-
-        side_calibrated = true;
 
         return true;
     }
