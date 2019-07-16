@@ -220,25 +220,6 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         // TODO Uncomment this to receive marker pose from port
         Vector *marker_pose = port_marker_pose_in.read();
 
-        // TODO Temporary for tests in simulation: Remove this once
-        // connected to the port
-        // Vector position(3);
-        // position(0) = -0.15;
-        // position(1) = 0.2;
-        // position(2) = -0.15;
-        //
-        // Vector orientation(4, 0.0);
-        // orientation(2) = 1.0;
-        // orientation(3) = 1.57;
-        //
-        // Vector marker(7);
-        // marker.resize(7,0.0);
-        // marker.setSubvector(0,position);
-        // marker.setSubvector(3,orientation);
-        //
-        // Vector *marker_pose = &marker;
-        ///////
-
         if (marker_pose != NULL)
         {
             marker_pose_matrix.resize(4,4);
@@ -564,8 +545,8 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
         if (trajectory.size() == 0)
         {
-            yError() << log_ID << "Trajectory size 0!"
-;            return false;
+            yError() << log_ID << "Trajectory size 0!";
+            return false;
         }
         else
         {
@@ -575,12 +556,12 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
             {
                 if (moving_arm == "left")
                 {
-		    int context_0;
-		    icart_left->storeContext(&context_0);
+                    int context_0;
+                    icart_left->storeContext(&context_0);
 
                     yInfo() << log_ID << " Storing old context of cartesian and setting new parameters...";
 
-		    Vector dof;
+                    Vector dof;
                     icart_left->getDOF(dof);
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
@@ -593,18 +574,18 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                     icart_left->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
                     icart_left->waitMotionDone(0.4, 4.0);
 
-                    icart_left->restoreContext(context_0);   
-  
+                    icart_left->restoreContext(context_0);
+
                     yInfo() << log_ID << " Restored context of cartesian";
                 }
                 else if (moving_arm == "right")
                 {
                     int context_0;
-		    icart_right->storeContext(&context_0);
+                    icart_right->storeContext(&context_0);
 
                     yInfo() << log_ID << " Storing old context of cartesian and setting new parameters...";
 
-		    Vector dof;
+                    Vector dof;
                     icart_right->getDOF(dof);
                     Vector new_dof(10, 1);
                     new_dof(1) = 0.0;
@@ -617,8 +598,8 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                     icart_right->goToPoseSync(t.subVector(0,2), t.subVector(3,6));
                     icart_right->waitMotionDone(0.4, 4.0);
 
-		    icart_right->restoreContext(context_0);   
-  
+                    icart_right->restoreContext(context_0);
+
                     yInfo() << log_ID << " Restored context of cartesian";
                 }
                 count ++;
@@ -659,10 +640,6 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
             Vector pose_tmp = pose_0;
             pose_tmp[2] += 0.15;
-            // TODO Check This
-            // It's not necessary to add this pose
-            // since ARE already lift the object of a desired height
-            //trajectory.push_back(pose_tmp);
 
             // Compute waypoint 0
             Matrix pose_rotate_hf(3,3);
