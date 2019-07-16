@@ -294,6 +294,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         string log_ID = "[decrease_pose]";
 
         pose_count--;
+	yInfo() << "Removing ast reached pose removed from vector of size:  " << reached_poses.size();
+	reached_poses.pop_back();
+	yInfo() << "Last reached pose removed: " << reached_poses.size();
 
         if (pose_count > -1)
         {
@@ -420,7 +423,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         //Vector hand_pose(7,0.0);
         //Vector *hand_marker_pose = &hand_pose;
 
-        Time::delay(1.0);
+        Time::delay(5.0);
 
         if (hand_marker_pose != NULL)
         {

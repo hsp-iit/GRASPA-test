@@ -336,7 +336,7 @@ public:
     			Vector direction(3,0.0);
     			direction = att_wrt_cam_yarp.subcol(0,0,3);
     			direction /= norm(direction);
-    			pos_wrt_cam+= 0.03 * direction;
+    			pos_wrt_cam+= 0.025 * direction;
 
     			direction = att_wrt_cam_yarp.subcol(0,1,3);
     			direction /= norm(direction);
@@ -344,7 +344,7 @@ public:
 
     			direction = att_wrt_cam_yarp.subcol(0,2,3);
     			direction /= norm(direction);
-    			pos_wrt_cam -= 0.05 * direction;
+    			pos_wrt_cam -= 0.035 * direction;
 
     			Matrix R_around_x(3,3);
     			R_around_x.zero();
@@ -578,7 +578,7 @@ public:
         Vector direction(3,0.0);
     	direction = att_wrt_cam_yarp_dorso.subcol(0,0,3);
     	direction /= norm(direction);
-    	pos_hand_frame += 0.03 * direction;
+    	pos_hand_frame += 0.025 * direction;
 
     	direction = att_wrt_cam_yarp_dorso.subcol(0,1,3);
     	direction /= norm(direction);
@@ -586,7 +586,7 @@ public:
 
     	direction = att_wrt_cam_yarp_dorso.subcol(0,2,3);
     	direction /= norm(direction);
-    	pos_hand_frame -=  0.05 * direction;
+    	pos_hand_frame -=  0.035 * direction;
 
     	Matrix R_around_x(3,3);
     	R_around_x.zero();
