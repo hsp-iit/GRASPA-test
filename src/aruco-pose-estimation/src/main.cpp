@@ -48,8 +48,6 @@ class ArucoPoseEstimation : public RFModule, ArucoPoseEstimation_IDL
     bool send_image;
     // Check if marker side position is calibrated
     bool side_calibrated;
-    // Matrix from marker on dorso to hand frame
-    Matrix from_dorso_to_frame;
     // Matrix from marker on side to frame
     Matrix from_side_to_frame;
     // Dictionary of the marker
@@ -171,9 +169,9 @@ public:
         else if (dictionary_string == "4x4")
             dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
 
+        // We need to calibrate the matrix to transform side marker pose to hand pose
         yError() << log_ID_ << "Matrix from side marker to hand frame needs to be calibrated!";
         side_calibrated = false;
-
         from_side_to_frame.resize(4,4);
         from_side_to_frame(3,3) = 1;
 
@@ -215,9 +213,7 @@ public:
         string log_ID = "[UpdateModule]";
         // Read from the camera
         ImageOf<PixelRgb>* image_in;
-
         image_in = port_image_in.read(true);
-
         if (image_in == nullptr)
             return true;
 
@@ -261,19 +257,14 @@ public:
 
         cv::aruco::refineDetectedMarkers(image, board, corners, ids, rejected);
 
-        // Estimate pose of the board
+        // Estimate pose of the board/markers
         cv::Vec3d rvec, tvec;
-
         vector<cv::Vec3d> rvecs, tvecs;
-
 
         if (use_board)
             valid = cv::aruco::estimatePoseBoard(corners, ids,  board, cam_intrinsic, cam_distortion, rvec, tvec);
         else
-        {
             cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
-        }
-
 
         if (send_image)
         {
@@ -298,9 +289,15 @@ public:
                     }
                     else
                     {
-                        if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+                        if (found_dorso == true && ids[i] == marker_id_dorso)
                         {
                         	cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
+                        	rvec = rvecs[i];
+                        	tvec = tvecs[i];
+                        }
+                        else if (found_side == true && ids[i] == marker_id_side)
+                        {
+                            cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.05);
                         	rvec = rvecs[i];
                         	tvec = tvecs[i];
                         }
@@ -336,7 +333,6 @@ public:
         {
         	if (found_dorso == true)
         	{
-
     			Vector direction(3,0.0);
     			direction = att_wrt_cam_yarp.subcol(0,0,3);
     			direction /= norm(direction);
@@ -369,7 +365,6 @@ public:
 
                 att_wrt_cam_yarp = att_wrt_cam_yarp * from_side_to_frame.submatrix(0,2,0,2);
             }
-
         }
         else
         {
@@ -384,7 +379,6 @@ public:
         tvec_translated[0] = pos_wrt_cam[0];
         tvec_translated[1] = pos_wrt_cam[1];
         tvec_translated[2] = pos_wrt_cam[2];
-
 
         cv::Vec3d rvec_rotated;
         cv::Mat att_wrt_cam_cv_rot(cv::Size(3,3), CV_64FC1);
@@ -408,7 +402,9 @@ public:
     	    {
         		for (size_t i=0; i< ids.size(); i++)
         		{
-        			if (ids[i] == marker_id_dorso || ids[i] == marker_id_side)
+        			if (ids[i] == marker_id_dorso && found_dorso == true)
+        				cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.1);
+                    if (ids[i] == marker_id_side && found_side == true && side_calibrated == true)
         				cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvecs[i], tvecs[i], 0.1);
         		}
                 cv::aruco::drawAxis(image, cam_intrinsic, cam_distortion, rvec_rotated, tvec_translated, 0.1);
@@ -461,9 +457,7 @@ public:
 
         // Read from the camera
         ImageOf<PixelRgb>* image_in;
-
         image_in = port_image_in.read(true);
-
         if (image_in == nullptr)
     	{
     	    yError() << log_ID << "No image received!";
@@ -500,7 +494,7 @@ public:
 
         if (!(found_dorso == true && found_side == true))
     	{
-    	    yError() << log_ID << "No marker detected!";
+    	    yError() << log_ID << "No markers detected!";
                 return false;
     	}
 
@@ -510,7 +504,6 @@ public:
         cv::Vec3d rvec_side, tvec_side;
         cv::Vec3d rvec_dorso, tvec_dorso;
         vector<cv::Vec3d> rvecs, tvecs;
-
         cv::aruco::estimatePoseSingleMarkers(corners, marker_length, cam_intrinsic, cam_distortion, rvecs, tvecs);
 
         if (send_image)
