@@ -128,7 +128,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     new_dof(1) = 0.0;
                     icart_left->setDOF(new_dof, dof);
                     icart_left->setInTargetTol(0.005);
-                    icart_left->setLimits(0, 0.0, 15.0);
+                    icart_left->setLimits(0, 0.0, 30.0);
 
                     icart_left->getPose(home_pos_left, home_orie_left);
                 }
@@ -153,7 +153,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     new_dof(1) = 0.0;
                     icart_right->setDOF(new_dof, dof);
                     icart_right->setInTargetTol(0.005);
-                    icart_right->setLimits(0, 0.0, 15.0);
+                    icart_right->setLimits(0, 0.0, 30.0);
 
                     icart_right->getPose(home_pos_right, home_orie_right);
                 }
