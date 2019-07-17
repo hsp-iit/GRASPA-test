@@ -613,12 +613,19 @@ public:
     	direction /= norm(direction);
     	pos_hand_frame -=  0.035 * direction;
 
-    	Matrix R_around_x(3,3);
-    	R_around_x.zero();
-    	R_around_x(0,0) = 1.0;
-    	R_around_x(1,1) = -1.0;
-    	R_around_x(2,2) = -1.0;
-    	att_yarp_hand_frame = att_wrt_cam_yarp_dorso * R_around_x;
+	if (hand_name == "right")
+	{
+
+	    	Matrix R_around_x(3,3);
+	    	R_around_x.zero();
+	    	R_around_x(0,0) = 1.0;
+	    	R_around_x(1,1) = -1.0;
+	    	R_around_x(2,2) = -1.0;
+	    	att_yarp_hand_frame = att_wrt_cam_yarp_dorso * R_around_x;
+	}
+	else
+		att_yarp_hand_frame = att_wrt_cam_yarp_dorso;
+		
 
         // This is the hand frame obtained from dorso marker
         Matrix hand_frame(4,4);
