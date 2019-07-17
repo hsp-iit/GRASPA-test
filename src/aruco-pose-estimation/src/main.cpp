@@ -32,6 +32,8 @@ class ArucoPoseEstimation : public RFModule, ArucoPoseEstimation_IDL
 {
     // Camera name
     string eye_name;
+    // Hand name
+    string hand_name;
     // Prefix for ports
     string port_prefix;
     // Aruco Dictionary
@@ -76,6 +78,7 @@ public:
 
         // Read data from config.ini
         eye_name = rf.check("eye_name", Value("right")).asString();
+        hand_name = rf.check("hand_name", Value("right")).asString();
         send_image = rf.check("send_image", Value("True")).asBool();
         port_prefix = rf.check("port_prefix", Value("aruco-base-marker-estimation")).asString();
         dictionary_string = rf.check("aruco_dictionary", Value("4x4")).asString();
@@ -92,6 +95,7 @@ public:
 
         yInfo() << "=====================================";
         yInfo() << "eye_name " << eye_name;
+        yInfo() << "hand_name " << hand_name;
         yInfo() << "n_markers_x " << n_markers_x;
         yInfo() << "n_markers_y " << n_markers_y;
         yInfo() << "marker_length " << marker_length;
@@ -333,26 +337,47 @@ public:
         {
         	if (found_dorso == true)
         	{
-    			Vector direction(3,0.0);
-    			direction = att_wrt_cam_yarp.subcol(0,0,3);
-    			direction /= norm(direction);
-    			pos_wrt_cam+= 0.025 * direction;
+                if (hand_name == "right")
+                {
+                    Vector direction(3,0.0);
+        			direction = att_wrt_cam_yarp.subcol(0,0,3);
+        			direction /= norm(direction);
+        			pos_wrt_cam+= 0.025 * direction;
 
-    			direction = att_wrt_cam_yarp.subcol(0,1,3);
-    			direction /= norm(direction);
-    			pos_wrt_cam += 0.0 * direction;
+        			direction = att_wrt_cam_yarp.subcol(0,1,3);
+        			direction /= norm(direction);
+        			pos_wrt_cam += 0.0 * direction;
 
-    			direction = att_wrt_cam_yarp.subcol(0,2,3);
-    			direction /= norm(direction);
-    			pos_wrt_cam -= 0.035 * direction;
+        			direction = att_wrt_cam_yarp.subcol(0,2,3);
+        			direction /= norm(direction);
+        			pos_wrt_cam -= 0.035 * direction;
 
-    			Matrix R_around_x(3,3);
-    			R_around_x.zero();
-    			R_around_x(0,0) = 1.0;
-    			R_around_x(1,1) = -1.0;
-    			R_around_x(2,2) = -1.0;
+        			Matrix R_around_x(3,3);
+        			R_around_x.zero();
+        			R_around_x(0,0) = 1.0;
+        			R_around_x(1,1) = -1.0;
+        			R_around_x(2,2) = -1.0;
 
-    			att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
+        			att_wrt_cam_yarp = att_wrt_cam_yarp * R_around_x;
+                }
+                else
+                {
+                    // For left we just need to move the origin TODO check this
+                    Vector direction(3,0.0);
+        			direction = att_wrt_cam_yarp.subcol(0,0,3);
+        			direction /= norm(direction);
+        			pos_wrt_cam+= 0.025 * direction;
+
+        			direction = att_wrt_cam_yarp.subcol(0,1,3);
+        			direction /= norm(direction);
+        			pos_wrt_cam += 0.0 * direction;
+
+        			direction = att_wrt_cam_yarp.subcol(0,2,3);
+        			direction /= norm(direction);
+        			pos_wrt_cam -= 0.035 * direction;
+
+                }
+
         	}
             else if (found_side == true && side_calibrated == true)
             {
