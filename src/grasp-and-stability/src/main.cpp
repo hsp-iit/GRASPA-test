@@ -443,7 +443,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         file_vis.text().set(model_path.c_str());
 
 
-        pugi::xml_node collision = root.append_child("CollissionModel");
+        pugi::xml_node collision = root.append_child("CollisionModel");
         pugi::xml_node file_collision = collision.append_child("File");
         file_collision.append_attribute("type") = "inventor";
         file_collision.text().set(model_path.c_str());
