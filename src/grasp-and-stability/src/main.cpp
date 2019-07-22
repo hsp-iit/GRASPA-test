@@ -500,13 +500,13 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         row4.append_attribute("c3") = 0;
         row4.append_attribute("c4") = 1;
 
-        pugi::xml_node graspable = root.append_child("Graspable");
+        pugi::xml_node graspable = grasps_file.append_child("Graspable");
         graspable.append_attribute("quality") = graspable_value;
 
-        pugi::xml_node grasped = root.append_child("Grasped");
+        pugi::xml_node grasped = grasps_file.append_child("Grasped");
         grasped.append_attribute("quality") = grasped_value;
 
-        pugi::xml_node grasp_stability = root.append_child("GraspStability");
+        pugi::xml_node grasp_stability = grasps_file.append_child("GraspStability");
         grasp_stability.append_attribute("quality") = grasp_stability_value;
 
         string complete_path_file = "Ycb" + maps_object_name[object_name] + "_grasp.xml";
