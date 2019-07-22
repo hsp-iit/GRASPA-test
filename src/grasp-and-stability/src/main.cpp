@@ -427,7 +427,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool save_grasp_data(const double graspable_value, const double grasped_value, const double grasp_stability_value)
+    bool save_grasp_data(const double graspable_value, const double grasped_value, const double grasp_stability_value, const int hit_obstacles)
     {
         string log_ID = "acquire_grasp_data";
 
@@ -508,6 +508,8 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
         pugi::xml_node grasp_stability = grasps_file.append_child("GraspStability");
         grasp_stability.append_attribute("quality") = grasp_stability_value;
+        pugi::xml_node obstacles_node = grasps_file.append_child("ObstacleAvoidance");
+        obstacles_node.append_attribute("quality") = hit_obstacles;
 
         string complete_path_file = "Ycb" + maps_object_name[object_name] + "_grasp.xml";
         grasps_file.save_file(complete_path_file.c_str());
