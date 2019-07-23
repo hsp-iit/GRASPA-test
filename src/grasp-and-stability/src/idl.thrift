@@ -41,12 +41,16 @@
 
      bool generate_trajectory();
 
-     bool save_grasp_data(1: double graspable, 2: double grasped, 3: double grasp_stability, 4: double obstacles);
+     bool save_grasp_data(1: double graspable);
 
      bool execute_trajectory();
 
      bool set_layout_name(1: string &name);
 
      bool home();
+
+     bool reset_poses();
+
+     bool add_object_data(1: double grasped, 2: double grasp_stability, 3: double obstacles);
 
  }

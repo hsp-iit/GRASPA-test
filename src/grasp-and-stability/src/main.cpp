@@ -64,6 +64,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
     // All poses collected for a single object
     vector<Vector> all_grasp_poses;
+    vector<double> grasped_values;
+    vector<double> grasp_stability_values;
+    vector<double> hit_obstacles_values;
 
     // Home positions
     Vector home_pos_left, home_orie_left;
@@ -433,7 +436,21 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool save_grasp_data(const double graspable_value, const double grasped_value, const double grasp_stability_value, const double hit_obstacles)
+    bool add_object_data(const double grasped_value, const double grasp_stability_value, const double hit_obstacles)
+    {
+        grasped_values.push_back(grasped_value);
+        grasp_stability_values.push_back(grasp_stability_value);
+        hit_obstacles_values.push_back(hit_obstacles);
+
+        yInfo() << "[add_object_data]" << "Number of grasped values collected:" << grasped_values.size();
+        yInfo() << "[add_object_data]" << "Number of grasp_stability_values collected:" << grasp_stability_values.size();
+        yInfo() << "[add_object_data]" << "Number of hit_obstacles_values collected:" << hit_obstacles_values.size();
+
+        return true;
+    }
+
+    /****************************************************************/
+    bool save_grasp_data(const double graspable_value)
     {
         string log_ID = "acquire_grasp_data";
 
@@ -513,12 +530,28 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         graspable.append_attribute("quality") = graspable_value;
 
         pugi::xml_node grasped = grasps_file.append_child("Grasped");
-        grasped.append_attribute("quality") = grasped_value;
+        for (size_t i = 0 ; i < all_grasp_poses.size(); i++)
+        {
+            pugi::xml_node grasped_item = grasped.append_child("Grasp");
+            grasped_item.append_attribute("name") = ("Grasp " + std::to_string(i)).c_str();
+            grasped_item.append_attribute("quality") = grasped_values[i];
+        }
 
         pugi::xml_node grasp_stability = grasps_file.append_child("GraspStability");
-        grasp_stability.append_attribute("quality") = grasp_stability_value;
+        for (size_t i = 0 ; i < all_grasp_poses.size(); i++)
+        {
+            pugi::xml_node grasp_stability_item = grasp_stability.append_child("Grasp");
+            grasp_stability_item.append_attribute("name") = ("Grasp " + std::to_string(i)).c_str();
+            grasp_stability_item.append_attribute("quality") = grasp_stability_values[i];
+        }
+
         pugi::xml_node obstacles_node = grasps_file.append_child("ObstacleAvoidance");
-        obstacles_node.append_attribute("quality") = hit_obstacles;
+        for (size_t i = 0 ; i < all_grasp_poses.size(); i++)
+        {
+            pugi::xml_node obstacles_node_item = obstacles_node.append_child("Grasp");
+            obstacles_node_item.append_attribute("name") = ("Grasp " + std::to_string(i)).c_str();
+            obstacles_node_item.append_attribute("quality") = hit_obstacles_values[i];
+        }
 
         string complete_path_file = "Ycb" + maps_object_name[object_name] + "_grasp.xml";
         grasps_file.save_file(complete_path_file.c_str());
@@ -534,6 +567,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     bool reset_poses()
     {
         all_grasp_poses.clear();
+        grasped_values.clear();
+        grasp_stability_values.clear();
+        hit_obstacles_values.clear();
         yInfo() << "[reset_poses]" << "Grasp poses reset";
         return true;
     }
