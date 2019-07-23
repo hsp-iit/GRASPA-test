@@ -124,4 +124,14 @@
         <to>/actionsRenderingEngine/cmd:io</to>
         <protocol>fast_tcp</protocol>
     </connection>
+    <connection>
+        <from>/grasp-and-stability/reach_cal:rpc</from>
+        <to>/iolReachingCalibration/rpc</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
+    <connection>
+        <from>/hand-pose-estimation/reach_cal:rpc</from>
+        <to>/iolReachingCalibration/rpc</to>
+        <protocol>fast_tcp</protocol>
+    </connection>
 </application>

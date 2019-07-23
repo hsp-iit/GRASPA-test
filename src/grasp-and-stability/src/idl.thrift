@@ -53,4 +53,8 @@
 
      bool add_object_data(1: double grasped, 2: double grasp_stability, 3: double obstacles);
 
+     bool remove_last_grasp();
+
+     bool remove_last_object_data();
+
  }

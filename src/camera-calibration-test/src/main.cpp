@@ -56,6 +56,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     // Port for thrift services
     RpcServer user_rpc;
 
+    // Port to communicate with IOL reaching calibration
+    RpcClient reach_calib_rpc;
+
     // Robot params
     string robot;
     string robot_arm;
@@ -200,6 +203,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         // Open port for aruko pose
         port_marker_pose_hand_in.open("/" + port_prefix + "/pose_hand:in");
 
+        // Open port for iolReachingCalibration
+        reach_calib_rpc.open("/" + port_prefix + "/reach_cal:rpc");
+
         //  attach callback
         attach(user_rpc);
 
@@ -242,6 +248,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     bool close()
     {
         user_rpc.close();
+        reach_calib_rpc.close();
 
         if (left_arm_client.isValid())
         {
@@ -294,9 +301,9 @@ class ReachingTest : public RFModule, ReachingTest_IDL
         string log_ID = "[decrease_pose]";
 
         pose_count--;
-	yInfo() << "Removing ast reached pose removed from vector of size:  " << reached_poses.size();
-	reached_poses.pop_back();
-	yInfo() << "Last reached pose removed: " << reached_poses.size();
+    	yInfo() << "Removing ast reached pose removed from vector of size:  " << reached_poses.size();
+    	reached_poses.pop_back();
+    	yInfo() << "Last reached pose removed: " << reached_poses.size();
 
         if (pose_count > -1)
         {
@@ -353,7 +360,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     icart_left->waitMotionDone(0.4, 4.0);
                     icart_left->getPose(pos_cart, orie_cart);
 
-                    if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart))
+                    if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart, arm))
                     {
                         yError() << log_ID << "Problems in getting hand pose with marker!";
                         success = false;
@@ -371,7 +378,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
                     icart_right->waitMotionDone(0.4, 4.0);
                     icart_right->getPose(pos_cart, orie_cart);
 
-                    if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart))
+                    if (!getPoseFromMarker(reached_position, reached_orientation, pos_cart, arm))
                     {
                         yError() << log_ID << "Problems in getting hand pose with marker!";
                         success = false;
@@ -406,7 +413,64 @@ class ReachingTest : public RFModule, ReachingTest_IDL
     }
 
     /****************************************************************/
-    bool getPoseFromMarker(Vector &pos, Vector &orie, const Vector &position_from_cartesian)
+    bool fixReachingOffset(const Vector &pose_received, Vector &pose_from_map,
+                           const bool invert, const string &moving_arm)
+    {
+        string log_ID = "[fix_reaching_offset]";
+        //  fix the pose offset accordint to iolReachingCalibration
+        //  pose is supposed to be (x y z gx gy gz theta)
+        if ((robot == "r1" || robot == "icub") && reach_calib_rpc.getOutputCount() > 0)
+        {
+            Bottle command, reply;
+
+            command.addString("get_location_nolook");
+            if (moving_arm == "left")
+            {
+                command.addString("iol-left");
+            }
+            else
+            {
+                command.addString("iol-right");
+            }
+
+            command.addDouble(pose_received(0));    //  x value
+            command.addDouble(pose_received(1));    //  y value
+            command.addDouble(pose_received(2));    //  z value
+            command.addInt(invert?1:0);         //  flag to invert input/output map
+
+            reach_calib_rpc.write(command, reply);
+
+            //  incoming reply is going to be (success x y z)
+            if (reply.size() < 2)
+            {
+                yError() << log_ID << "Failure retrieving fixed pose";
+                return false;
+            }
+            else if (reply.get(0).asVocab() == Vocab::encode("ok"))
+            {
+                pose_from_map = pose_received;
+                pose_from_map(0) = reply.get(1).asDouble();
+                pose_from_map(1) = reply.get(2).asDouble();
+                pose_from_map(2) = reply.get(3).asDouble();
+                return true;
+            }
+            else
+            {
+                yWarning() << log_ID << "Couldn't retrieve fixed pose. Continuing with unchanged pose";
+                pose_from_map = pose_received;
+            }
+        }
+        else
+        {
+            //  if we are working with the simulator or there is no calib map, the pose doesn't need to be corrected
+            pose_from_map = pose_received;
+            yWarning() << log_ID << "Connection to iolReachingCalibration not detected or calibration map not present: pose will not be changed";
+            return true;
+        }
+    }
+
+    /****************************************************************/
+    bool getPoseFromMarker(Vector &pos, Vector &orie, const Vector &position_from_cartesian, const string &arm)
     {
         string log_ID = "[getPoseFromMarker]";
 
@@ -432,6 +496,20 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
             yInfo() << log_ID << "Received marker pose (Position): " << pos.toString();
             yInfo() << log_ID << "Received marker pose (Orientation): " << orie.toString();
+
+            Vector pose_to_fix(7,0.0);
+            pose_to_fix.setSubvector(0, pos);
+            pose_to_fix.setSubvector(3, orie);
+
+            Vector pose_fixed(7,0.0);
+
+            fixReachingOffset(pose_to_fix, pose_fixed, false, arm);
+
+            yDebug() << log_ID << "Input to iolReachingCalibration: " << pose_to_fix.toString();
+            yInfo() << log_ID << "Pose corrected by iolReachingCalibration: " << pose_fixed.toString();
+
+            pos = pose_fixed.subVector(0,2);
+            orie = pose_fixed.subVector(3,6);
 
             igaze->blockNeckRoll(0.0);
             igaze->blockNeckYaw(0.0);

@@ -56,7 +56,10 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     RpcClient grasp_pose_port;
 
     // Port to communicare with ARE
-    RpcClient action_render_rpc;
+    RpcClient action_render_rpc;;
+
+    // Port to communicate with IOL reaching calibration
+    RpcClient reach_calib_rpc;
 
     // Robot params
     string robot;
@@ -210,6 +213,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         // Open port for aruko pose
         port_marker_pose_in.open("/" + port_prefix + "/pose:in");
 
+        // Open port for iolReachingCalibration
+        reach_calib_rpc.open("/" + port_prefix + "/reach_cal:rpc");
+
         //  attach callback
         attach(user_rpc);
 
@@ -280,6 +286,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         user_rpc.close();
         action_render_rpc.close();
         grasp_pose_port.close();
+        reach_calib_rpc.close();
 
         if (left_arm_client.isValid())
         {
@@ -340,7 +347,12 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     		    yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
     		    yInfo() << log_ID << "As rotation matrix: " << axis2dcm(grasp_pose.subVector(3,6)).submatrix(0,2,0,2).toString();
     		    can_grasp = true;
-                all_grasp_poses.push_back(grasp_pose);
+
+                // If the pose has been corrected by iolReachingCalibration we want to store
+                // is the original one
+                Vector grasp_pose_original(7,0.0);
+                fixReachingOffset(grasp_pose, grasp_pose_original);
+                all_grasp_poses.push_back(grasp_pose_original);
                 yInfo() << log_ID << "Number of poses collected so far for object" << object << " :" << all_grasp_poses.size();
 
     		    return true;
@@ -358,6 +370,64 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     		return false;
     	}
     }
+
+    /****************************************************************/
+    bool fixReachingOffset(const Vector &pose_received, Vector &pose_from_map,
+                           const bool invert=true)
+    {
+        string log_ID = "[fix_reaching_offset]";
+        //  fix the pose offset accordint to iolReachingCalibration
+        //  pose is supposed to be (x y z gx gy gz theta)
+        if ((robot == "r1" || robot == "icub") && reach_calib_rpc.getOutputCount() > 0)
+        {
+            Bottle command, reply;
+
+            command.addString("get_location_nolook");
+            if (moving_arm == "left")
+            {
+                command.addString("iol-left");
+            }
+            else
+            {
+                command.addString("iol-right");
+            }
+
+            command.addDouble(pose_received(0));    //  x value
+            command.addDouble(pose_received(1));    //  y value
+            command.addDouble(pose_received(2));    //  z value
+            command.addInt(invert?1:0);         //  flag to invert input/output map
+
+            reach_calib_rpc.write(command, reply);
+
+            //  incoming reply is going to be (success x y z)
+            if (reply.size() < 2)
+            {
+                yError() << log_ID << "Failure retrieving fixed pose";
+                return false;
+            }
+            else if (reply.get(0).asVocab() == Vocab::encode("ok"))
+            {
+                pose_from_map = pose_received;
+                pose_from_map(0) = reply.get(1).asDouble();
+                pose_from_map(1) = reply.get(2).asDouble();
+                pose_from_map(2) = reply.get(3).asDouble();
+                return true;
+            }
+            else
+            {
+                yWarning() << log_ID << "Couldn't retrieve fixed pose. Continuing with unchanged pose";
+                pose_from_map = pose_received;
+            }
+        }
+        else
+        {
+            //  if we are working with the simulator or there is no calib map, the pose doesn't need to be corrected
+            pose_from_map = pose_received;
+            yWarning() << log_ID << "Connection to iolReachingCalibration not detected or calibration map not present: pose will not be changed";
+            return true;
+        }
+    }
+
 
     /****************************************************************/
     bool grasp()
@@ -433,6 +503,25 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
             return false;
         }
+    }
+
+    /****************************************************************/
+    bool remove_last_grasp()
+    {
+        all_grasp_poses.pop_back();
+        yInfo() << "[remove_last_grasp]" << "Number of grasped values collected:" << all_grasp_poses.size();
+    }
+
+    /****************************************************************/
+    bool remove_last_object_data()
+    {
+        grasped_values.pop_back();
+        grasp_stability_values.pop_back();
+        hit_obstacles_values.pop_back();
+
+        yInfo() << "[remove_last_object_data]" << "Number of grasped values collected:" << grasped_values.size();
+        yInfo() << "[remove_last_object_data]" << "Number of grasp_stability_values collected:" << grasp_stability_values.size();
+        yInfo() << "[remove_last_object_data]" << "Number of hit_obstacles_values collected:" << hit_obstacles_values.size();
     }
 
     /****************************************************************/
