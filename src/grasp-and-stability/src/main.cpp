@@ -62,6 +62,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     string robot;
     string robot_arm;
 
+    // All poses collected for a single object
+    vector<Vector> all_grasp_poses;
+
     // Home positions
     Vector home_pos_left, home_orie_left;
     Vector home_pos_right, home_orie_right;
@@ -334,6 +337,9 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     		    yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
     		    yInfo() << log_ID << "As rotation matrix: " << axis2dcm(grasp_pose.subVector(3,6)).submatrix(0,2,0,2).toString();
     		    can_grasp = true;
+                all_grasp_poses.push_back(grasp_pose);
+                yInfo() << log_ID << "Number of poses collected so far for object" << object << " :" << all_grasp_poses.size();
+
     		    return true;
     		}
     		else
@@ -456,49 +462,52 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         else
             grasps.append_attribute("EndEffector") =  "Right Hand";
 
-        pugi::xml_node single_grasp = grasps.append_child("Grasp");
-        single_grasp.append_attribute("name") = "Grasp 1";
-        single_grasp.append_attribute("quality") = 0.0;  // TODO This will be computed by the script
-        single_grasp.append_attribute("Creation") = "Simox - GraspStudio - GraspWrenchSpace";
-        single_grasp.append_attribute("Preshape") = "Grasp Preshape";
+        for (size_t i = 0 ; i < all_grasp_poses.size(); i++)
+        {
+            pugi::xml_node single_grasp = grasps.append_child("Grasp");
+            single_grasp.append_attribute("name") = ("Grasp " + std::to_string(i)).c_str();
+            single_grasp.append_attribute("quality") = 0.0;  // TODO This will be computed by the script
+            single_grasp.append_attribute("Creation") = "Simox - GraspStudio - GraspWrenchSpace";
+            single_grasp.append_attribute("Preshape") = "Grasp Preshape";
 
-        pugi::xml_node pose = single_grasp.append_child("Transform");
-        pugi::xml_node matrix = pose.append_child("Matrix4x4");
+            pugi::xml_node pose = single_grasp.append_child("Transform");
+            pugi::xml_node matrix = pose.append_child("Matrix4x4");
 
-        // TODO tO CHECK CORRECTNESS
-        Vector grasp_pose_om(4,1.0);
-        grasp_pose_om.setSubvector(0,grasp_pose.subVector(0,2));
+            // TODO tO CHECK CORRECTNESS
+            Vector grasp_pose_om(4,1.0);
+            grasp_pose_om.setSubvector(0,all_grasp_poses[i].subVector(0,2));
 
-        Vector position = (SE3inv(marker_pose_matrix) * grasp_pose_om).subVector(0,2);
+            Vector position = (SE3inv(marker_pose_matrix) * grasp_pose_om).subVector(0,2);
 
-        Matrix R_3x3 = axis2dcm(grasp_pose.subVector(3,6)).submatrix(0,2,0,2);
-        Matrix marker_pose_3x3_inv = SE3inv(marker_pose_matrix).submatrix(0,2,0,2);
+            Matrix R_3x3 = axis2dcm(all_grasp_poses[i].subVector(3,6)).submatrix(0,2,0,2);
+            Matrix marker_pose_3x3_inv = SE3inv(marker_pose_matrix).submatrix(0,2,0,2);
 
-        Matrix orientation_marker_frame = (marker_pose_3x3_inv * R_3x3);
+            Matrix orientation_marker_frame = (marker_pose_3x3_inv * R_3x3);
 
-        pugi::xml_node row1 = matrix.append_child("row1");
-        row1.append_attribute("c1") = toStringPrecision(orientation_marker_frame(0,0),3).c_str();
-        row1.append_attribute("c2") = toStringPrecision(orientation_marker_frame(0,1),3).c_str();
-        row1.append_attribute("c3") = toStringPrecision(orientation_marker_frame(0,2),3).c_str();
-        row1.append_attribute("c4") = toStringPrecision(position(0) * 1000,3).c_str();
+            pugi::xml_node row1 = matrix.append_child("row1");
+            row1.append_attribute("c1") = toStringPrecision(orientation_marker_frame(0,0),3).c_str();
+            row1.append_attribute("c2") = toStringPrecision(orientation_marker_frame(0,1),3).c_str();
+            row1.append_attribute("c3") = toStringPrecision(orientation_marker_frame(0,2),3).c_str();
+            row1.append_attribute("c4") = toStringPrecision(position(0) * 1000,3).c_str();
 
-        pugi::xml_node row2= matrix.append_child("row2");
-        row2.append_attribute("c1") = toStringPrecision(orientation_marker_frame(1,0),3).c_str();
-        row2.append_attribute("c2") = toStringPrecision(orientation_marker_frame(1,1),3).c_str();
-        row2.append_attribute("c3") = toStringPrecision(orientation_marker_frame(1,2),3).c_str();
-        row2.append_attribute("c4") = toStringPrecision(position(1) * 1000,3).c_str();
+            pugi::xml_node row2= matrix.append_child("row2");
+            row2.append_attribute("c1") = toStringPrecision(orientation_marker_frame(1,0),3).c_str();
+            row2.append_attribute("c2") = toStringPrecision(orientation_marker_frame(1,1),3).c_str();
+            row2.append_attribute("c3") = toStringPrecision(orientation_marker_frame(1,2),3).c_str();
+            row2.append_attribute("c4") = toStringPrecision(position(1) * 1000,3).c_str();
 
-        pugi::xml_node row3 = matrix.append_child("row3");
-        row3.append_attribute("c1") = toStringPrecision(orientation_marker_frame(2,0),3).c_str();
-        row3.append_attribute("c2") = toStringPrecision(orientation_marker_frame(2,1),3).c_str();
-        row3.append_attribute("c3") = toStringPrecision(orientation_marker_frame(2,2),3).c_str();
-        row3.append_attribute("c4") = toStringPrecision(position(2) * 1000,3).c_str();
+            pugi::xml_node row3 = matrix.append_child("row3");
+            row3.append_attribute("c1") = toStringPrecision(orientation_marker_frame(2,0),3).c_str();
+            row3.append_attribute("c2") = toStringPrecision(orientation_marker_frame(2,1),3).c_str();
+            row3.append_attribute("c3") = toStringPrecision(orientation_marker_frame(2,2),3).c_str();
+            row3.append_attribute("c4") = toStringPrecision(position(2) * 1000,3).c_str();
 
-        pugi::xml_node row4 = matrix.append_child("row4");
-        row4.append_attribute("c1") = 0;
-        row4.append_attribute("c2") = 0;
-        row4.append_attribute("c3") = 0;
-        row4.append_attribute("c4") = 1;
+            pugi::xml_node row4 = matrix.append_child("row4");
+            row4.append_attribute("c1") = 0;
+            row4.append_attribute("c2") = 0;
+            row4.append_attribute("c3") = 0;
+            row4.append_attribute("c4") = 1;
+        }
 
         pugi::xml_node graspable = grasps_file.append_child("Graspable");
         graspable.append_attribute("quality") = graspable_value;
@@ -518,6 +527,14 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
 
         yInfo() << log_ID << "Grasps data saved in file " << "Ycb" + maps_object_name[object_name.c_str()] + "_grasp.xml";
 
+        return true;
+    }
+
+    /****************************************************************/
+    bool reset_poses()
+    {
+        all_grasp_poses.clear();
+        yInfo() << "[reset_poses]" << "Grasp poses reset";
         return true;
     }
 
