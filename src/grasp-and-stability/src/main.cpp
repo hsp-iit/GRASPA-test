@@ -427,7 +427,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     }
 
     /****************************************************************/
-    bool save_grasp_data(const double graspable_value, const double grasped_value, const double grasp_stability_value, const int hit_obstacles)
+    bool save_grasp_data(const double graspable_value, const double grasped_value, const double grasp_stability_value, const double hit_obstacles)
     {
         string log_ID = "acquire_grasp_data";
 

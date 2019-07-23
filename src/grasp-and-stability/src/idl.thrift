@@ -41,7 +41,7 @@
 
      bool generate_trajectory();
 
-     bool save_grasp_data(1: double graspable, 2: double grasped, 3: double grasp_stability);
+     bool save_grasp_data(1: double graspable, 2: double grasped, 3: double grasp_stability, 4: double obstacles);
 
      bool execute_trajectory();
 
