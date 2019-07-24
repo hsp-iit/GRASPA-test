@@ -503,7 +503,7 @@ class ReachingTest : public RFModule, ReachingTest_IDL
 
             Vector pose_fixed(7,0.0);
 
-            fixReachingOffset(pose_to_fix, pose_fixed, false, arm);
+            fixReachingOffset(pose_to_fix, pose_fixed, true, arm);
 
             yDebug() << log_ID << "Input to iolReachingCalibration: " << pose_to_fix.toString();
             yInfo() << log_ID << "Pose corrected by iolReachingCalibration: " << pose_fixed.toString();

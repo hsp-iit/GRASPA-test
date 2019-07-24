@@ -344,7 +344,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
     		        grasp_pose[i] = list_values->get(i).asDouble();
     		    }
 
-    		    yInfo() << log_ID << "Received grasp pose: " << grasp_pose.toString();
+    		    yInfo() << log_ID << "Received grasp pose (corrected by iolReachingCalibration): " << grasp_pose.toString();
     		    yInfo() << log_ID << "As rotation matrix: " << axis2dcm(grasp_pose.subVector(3,6)).submatrix(0,2,0,2).toString();
     		    can_grasp = true;
 
@@ -352,6 +352,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
                 // is the original one
                 Vector grasp_pose_original(7,0.0);
                 fixReachingOffset(grasp_pose, grasp_pose_original);
+		yInfo() << log_ID << "Original grasp pose: " << grasp_pose_original.toString();
                 all_grasp_poses.push_back(grasp_pose_original);
                 yInfo() << log_ID << "Number of poses collected so far for object" << object << " :" << all_grasp_poses.size();
 
