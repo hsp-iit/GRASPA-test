@@ -82,9 +82,9 @@
 	<Grasp name="Grasp 4" quality="0" />
 </ObstacleAvoidance>
 <ComputedQuality>
-    <Grasp name="Grasp 0" quality_collision_free="0.235039" quality_overall="0.235039"/>
-    <Grasp name="Grasp 1" quality_collision_free="0.243399" quality_overall="0.243399"/>
-    <Grasp name="Grasp 2" quality_collision_free="0.249872" quality_overall="0.249872"/>
-    <Grasp name="Grasp 3" quality_collision_free="0.0552156" quality_overall="0.0552156"/>
-    <Grasp name="Grasp 4" quality_collision_free="0.178676" quality_overall="0.178676"/>
+    <Grasp name="Grasp 0" quality_collision_free="0.239297" quality_overall="0.239297"/>
+    <Grasp name="Grasp 1" quality_collision_free="0.242238" quality_overall="0.242238"/>
+    <Grasp name="Grasp 2" quality_collision_free="0.218467" quality_overall="0.218467"/>
+    <Grasp name="Grasp 3" quality_collision_free="0.0332405" quality_overall="0.0332405"/>
+    <Grasp name="Grasp 4" quality_collision_free="0.153166" quality_overall="0.153166"/>
 </ComputedQuality>
