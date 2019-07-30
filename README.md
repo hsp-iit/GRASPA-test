@@ -12,6 +12,8 @@ In particular, the repo contains the following modules:
 
 The `aruko-pose-estimation` module relies on [`gaze-ctril-lib`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/gaze-ctrl-lib), a high-level library to communicate with the iCub `iKinGazeCtrl`.
 
+The `experiment_data` directory contains results and logs of benchmark evaluation on iCub, as they will be published in the paper. 
+
 ## Dependencies
 - YARP
 - icub-main
