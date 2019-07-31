@@ -66,7 +66,6 @@
 	<Grasp name="Grasp 2" quality="1" />
 	<Grasp name="Grasp 3" quality="0" />
 	<Grasp name="Grasp 4" quality="0" />
-	<Grasp name="Grasp 5" quality="0" />
 </Grasped>
 <GraspStability>
 	<Grasp name="Grasp 0" quality="1" />
@@ -74,7 +73,6 @@
 	<Grasp name="Grasp 2" quality="1" />
 	<Grasp name="Grasp 3" quality="0" />
 	<Grasp name="Grasp 4" quality="0" />
-	<Grasp name="Grasp 5" quality="0" />
 </GraspStability>
 <ObstacleAvoidance>
 	<Grasp name="Grasp 0" quality="0" />
@@ -82,7 +80,6 @@
 	<Grasp name="Grasp 2" quality="0" />
 	<Grasp name="Grasp 3" quality="0" />
 	<Grasp name="Grasp 4" quality="0" />
-	<Grasp name="Grasp 5" quality="0" />
 </ObstacleAvoidance>
 <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="0.14416" quality_overall="0.100912"/>
