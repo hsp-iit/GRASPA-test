@@ -48,9 +48,11 @@ Information on installation is available on the main [README.md](https://github.
 ## `aruco-pose-estimation` for markers board
 This is an example of estimated pose of the marker board (on the left), compared to the groung truth provided by the benchmark (on the right):
 
-TODO ADD 2 IMAGE
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/board_pose.png" width=350> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/scene1.png" width=350>
+</p>
 
-On the left of the leftmost image you can see the estimated pose of the Aruco board. On the right of the same image, we draw the estimated pose of the reference frame of the benchmark layouts. The estimated pose is good and coeherent with the ground truth shown in the image on the right.
+On the left of the left-most image you can see the estimated pose of the Aruco board. On the right of the same image, we draw the estimated pose of the reference frame of the benchmark layouts. The estimated pose is good and coeherent with the ground truth shown in the image on the right.
   
 The estimated pose is available in streaming at the port with name: `/<port-prefix>/marker-estimate/estimate:o`.
 
@@ -68,13 +70,17 @@ The calibration process requires the following steps:
   ```
 Module output before calibration:
 
-TODO ADD IMAGE 
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/before_calib.png" width=300>
+</p>
 
 The hand pose is obtained only when the marker on the dorso is visible, since the roto-translation to get the hand pose is known a priori.
 
 After the calibration:
 
-TODO ADD IMAGE
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/after_calib.png" width=300>
+</p>
 
 the hand pose is obtained also when only the marker on the side is visible.
 
