@@ -1,23 +1,20 @@
 # RAL-benchmark-test
-This repo contains the code for testing the RAL grasping benchmark on iCub.
 
-
-## Overview
 This repo provides the modules to acquire on the iCub robot all the data needed by the RAL grasping benchmark.
 In particular, the repo contains the following modules:
-- [`aruko-pose-estimation`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/aruko-pose-estimation) to estimate the 6D pose of the marker on the base of the layout and on the robot hand.
+- [`aruco-pose-estimation`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/aruco-pose-estimation) to estimate the 6D pose of the marker on the base of the layout and on the robot hand.
 - [`camera-calibration-test`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/camera-calibration-test) to collect data to test the **camera-kinematics calibration** of the robot,  as specified by the benchmark.
 - [`reaching-test`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/reaching-test) to collect data to test the **reachibility** of the robot,  as specified by the benchmark.
 - [`grasp-and-stability`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/grasp-and-stability) to execute the grasp, the trajectory to test the grasp-stability and save the data as specified by the benchmark.
 
-The `aruko-pose-estimation` module relies on [`gaze-ctril-lib`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/gaze-ctrl-lib), a high-level library to communicate with the iCub `iKinGazeCtrl`.
+The `aruco-pose-estimation` module relies on [`gaze-ctril-lib`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/gaze-ctrl-lib), a high-level library to communicate with the iCub `iKinGazeCtrl`.
 
 The `experiment_data` directory contains results and logs of benchmark evaluation on iCub, as they will be published in the paper. 
 
 ## Dependencies
-- YARP
-- icub-main
-- opencv
+- [`YARP`](http://www.yarp.it/)
+- [icub-main](https://github.com/robotology/icub-main)
+- [opencv](https://opencv.org/)
 
 ## How to compile the code
 ```
@@ -35,7 +32,7 @@ You can compile separately the modules by switching `OFF` the relative CMAKE var
 ## How to run the code
 - Run all the modules in [this file](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/app/data_collection.xml.template).
 
-  **Note**: There are two instances of `aruko-pose-estimation` running with different port prefixes to estimate both the layout pose and the hand pose (required when collecting data for the camera-kinematics calibration test).
+  **Note**: There are two instances of `aruco-pose-estimation` running with different port prefixes to estimate both the layout pose and the hand pose (required when collecting data for the camera-kinematics calibration test).
 - Connect all the ports.
 - Use `rpc` communication to communicate with each module and collect the data.
 
