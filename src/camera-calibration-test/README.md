@@ -2,7 +2,9 @@
 This is a Yarp module to automatically collect the information required for the camera calibration test defined by **GRASPA 1.0**.
 The goal of this test is to compute scores that evaluate the calibration of the vision system of the robot within the benchmark layout.
 
-TODO ADD IMAGE OF REACHING
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/camera-calib2.jpg" width=300>
+</p>
 
 The code makes the robot reach the desired pose, acquires the pose actually reached by using vision and saves the files
 according to the benchmark convention.
@@ -20,7 +22,7 @@ The pose of the layout reference frame is required to properly save the poses ac
 The pose of the hand is acquired using markers in order to test the calibration of the robot vision system.
 
 ## How to run the code
- - Launch both the [`aruco-pose-estimation`](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/app/data_collection.xml.template#L4) module to estimate the board pose, together with [their yarpviews](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/app/data_collection.xml.template#L40);
+ - Launch both the [`aruco-pose-estimation`](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/app/data_collection.xml.template#L4) modules to estimate the board and the hand pose, together with [their yarpviews](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/app/data_collection.xml.template#L40);
  - Launch [`camera-calibration-test`](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/app/data_collection.xml.template#L19) module;
  - Connect.
 
@@ -36,18 +38,21 @@ The data collection is to be done sending the commands to the robot via `rpc`:
    >> ask_new_pose
    ```
    The retrieved pose is one of the poses defined within the benchmark reachability files 
-   expressed in the robot reference frame, thanks to the estimate of the pose of the reference frame layout provided by the `aruco-pose-estimation` module.
-  
+   expressed in the robot reference frame, thanks to the estimate of the pose of the reference frame layout provided by the `aruco-pose-estimation` module.  
 
 3. Reach the pose just showed:
    ```
    >> execute_new_pose <arm>
    ```
    where `<arm>` can `right` or `left`.
+   
+   
+   <p align="center">
+   <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/camera-calib-viewer.jpg" width=300>
+   </p>
+   
    When the robot has reached the pose, the robot looks at its hand and acquired the reached pose by using the estimate given by
    the set of two markers.
-   
-   TO ADD IMAGE
    
 4. Repeat from 2. until the last pose is reached.
 5. When finish, save all the reached poses with the command:
