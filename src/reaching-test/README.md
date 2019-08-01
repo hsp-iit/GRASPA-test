@@ -63,7 +63,7 @@ Extra commands:
 - `increase_pose` increases the counter if you want to skip one specific pose.
  
 
-## Example of data collected
+## Example of collected ata 
 
 <img src="https://user-images.githubusercontent.com/9597070/62217821-a6291300-b3ab-11e9-97e4-01e1b27e07e1.png" width=300> <img src="https://user-images.githubusercontent.com/9597070/62217786-93aed980-b3ab-11e9-91de-ee7f393722d6.png" width=300>
 
