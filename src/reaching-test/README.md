@@ -2,7 +2,9 @@
 This is a Yarp module to automatically collect the information required for the reachability test defined by **GRASPA 1.0**.
 The goal of this test is to compute scores that evaluate the reachability of the robot within the benchmark layout.
 
-TODO ADD IMAGE OF REACHING
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/icub-reach.jpg" width=300>
+</p>
 
 The code makes the robot reach the desired pose, acquires the pose actually reached querying the forward kinematics and saves the files
 according to the benchmark convention.
