@@ -3,7 +3,9 @@
 This is a Yarp module to make the robot grasp objects, execute the trajectory for assessing the grasp stability and save all the data
 according to the **GRASPA 1.0** procedure.
 
-ADD 3 IMAGE: GRASP, TRAJECTORY VEDIAMO QUANTE
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/grasp.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/traj1.jpg" width=300> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/grasp.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/traj3.jpg" width=200>
+</p>
 
 [Here](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/experiment_data/right_arm/grasps_data) are the files 
 collecting all the data acquired with the iCub robot in the three layouts defined within the benchmark. The grasp planner we evaluated
