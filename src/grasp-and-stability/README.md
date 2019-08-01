@@ -4,7 +4,7 @@ This is a Yarp module to make the robot grasp objects, execute the trajectory fo
 according to the **GRASPA 1.0** procedure.
 
 <p align="center">
-<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/grasp.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/traj1.jpg" width=300> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/grasp.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/traj3.jpg" width=200>
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/grasp.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/traj1.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/grasp.jpg" width=200> <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/traj3.jpg" width=200>
 </p>
 
 [Here](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/experiment_data/right_arm/grasps_data) are the files 
