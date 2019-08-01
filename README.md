@@ -14,7 +14,7 @@ The `experiment_data` directory contains results and logs of benchmark evaluatio
 ## Dependencies
 - [`YARP`](http://www.yarp.it/)
 - [icub-main](https://github.com/robotology/icub-main)
-- [opencv](https://opencv.org/)
+- [opencv](https://opencv.org/) (for the `aruco-pose-estimation` module)
 
 ## How to compile the code
 ```
