@@ -6,29 +6,29 @@ The code has been designed starting from the OpenCv sample codes for estimating 
 
 The goal of this module is to estimate the pose of the Aruco marker board located on the printed layouts provided within our benchmark:
 
-TODO ADD IMAGE
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/benchmark-setup2.jpg" width=300>
+</p>
+
 
 The module can also estimate the pose of two markers, located on the robot hand, and convert this information in the estimated pose of the robot hand reference frame:
-
-TODO ADD TWO IMAGES (ALSO ICUB HAND)
+<p align="center">
+<img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/hand-markers.jpg" width=200> <img  hspace="100" src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/icub-hand-frame.jpg" width=120>
+</p>
 
 ## How to install the code
 Information on installation is available on the main [README.md](https://github.com/robotology-playground/RAL-benchmark-test#how-to-compile-the-code).
 
 
 ## Before running the code
-- Put the robot in front of the benchmark layout. The pose needs to be fixed in order to have consistent data during the acquisition.
-
- TODO: ADD IMAGE
+- Put the robot [in front of the benchmark layout](). The pose needs to be fixed in order to have consistent data during the acquisition.
  
 - Put the markers on the robot hand. We obtained good performance by using:
    - Original ArUco  dictionary
    - Marker lenghts of 0.04 m
    - Markers id 65 and 67. You can generate and print your markers [at this page](http://chev.me/arucogen/).
-   
-    TODO ADD IMAGE
     
-  **Note**: Be sure to  attach the marker on the dorso of the hand as shown in the image. The markers should also be printed on a rigid
+  **Note**: Be sure to  attach the marker on the dorso of the hand as shown in the image above. The markers should also be printed on a rigid
   support in order to have stable pose estimates. We're planning to provide some printable CAD models to be mounted on the robot hand as
   support for the markers. The positioning of the other marker is less strict, since the relative pose between the two is estimated during
   an initial calibration phase.
