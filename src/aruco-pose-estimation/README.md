@@ -1,8 +1,16 @@
 ## aruco-pose-estimation
 
-This is a Yarp module to estimate the pose of either a ArUco marker board and single Aruco Markers.
+This is a Yarp module to estimate the pose of either an ArUco marker board and single Aruco Markers.
 The code has been designed starting from the OpenCv sample codes for estimating the pose of 
-[boards](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_board.cpp) and [single marker pose](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_markers.cpp).
+[boards](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_board.cpp) and [single markers](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_markers.cpp).
+
+The goal of this module is to estimate the pose of the Aruco marker board located on the printed layouts provided within our benchmark:
+
+TODO ADD IMAGE
+
+The module can also estimate the pose of two markers, located on the robot hand, and convert this information in the estimated pose of the robot hand reference frame:
+
+TODO ADD TWO IMAGES (ALSO ICUB HAND)
 
 ## How to install the code
 Information on installation is available on the main [README.md](https://github.com/robotology-playground/RAL-benchmark-test#how-to-compile-the-code).
@@ -43,9 +51,31 @@ TODO ADD IMAGE
 On the left you can see the pose of the Aruco board. On the right, we draw the estimated pose of the reference frame of the benchmark layouts.
   
 The estimated pose is available in streaming at the port with name: `/<port-prefix>/marker-estimate/estimate:o`.
-Different port prefixes are used to run multiple modules of `aruco-pose-estimation`, [one](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/src/aruco-pose-estimation/conf/config_base.ini#L7) for estimating the board pose and
-[one](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/src/aruco-pose-estimation/conf/config_hand.ini#L9) for the markers on the robot hand.
+
   
 ## `aruco-pose-estimation` for markers on the robot hand
-Before using the module to get the pose of the robot hand
+Before using the module to get the pose of the robot hand, the module needs to be calibrated. 
+The calibration process requires the following steps:
+- Put the robot hand in the view of the robot, so that both markers can be detected by the module:
+  TODO ADD IMAGE
+- Connect through `rpc` and ask the robot to execute the calibration:
+  ``` 
+  yarp rpc /hand-pose-estimation/cmd:rpc
+  >> calibrate_markers
+  [ok]
+  ```
+Module output before calibration:
+
+TODO ADD IMAGE 
+
+The hand pose is obtained only when the marker on the dorso is visible, since the roto-translation to get the hand pose is known a priori.
+
+After the calibration:
+
+TODO ADD IMAGE
+
+the hand pose is obtained also when only the marker on the side is visible.
+
+The estimated pose is available in streaming at the port with name: `/<port-prefix>/marker-estimate/estimate:o`. Different port prefixes are used to run multiple modules of `aruco-pose-estimation`, [one](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/src/aruco-pose-estimation/conf/config_base.ini#L7) for estimating the board pose and
+[one](https://github.com/robotology-playground/RAL-benchmark-test/blob/master/src/aruco-pose-estimation/conf/config_hand.ini#L9) for the markers on the robot hand.
   
