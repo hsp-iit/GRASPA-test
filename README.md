@@ -3,7 +3,9 @@
 <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/benchmark-setup2.jpg" width=400>
 </p>
  
-This repo provides the modules to acquire on the iCub robot all the data needed by the RAL grasping benchmark.
+This repo provides the modules to acquire on the iCub robot all the data needed by **GRASP 1.0 (GRASPA is a Robotic Arm grAsping Performance benchmArk)**, a new benchmarking protocol recently proposed to evalute the performance of grasp planners.
+More information is available [at this link TODO PUT IT]().
+
 In particular, the repo contains the following modules:
 - [`aruco-pose-estimation`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/aruco-pose-estimation) to estimate the 6D pose of the marker on the base of the layout and on the robot hand.
 - [`camera-calibration-test`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/camera-calibration-test) to collect data to test the **camera-kinematics calibration** of the robot,  as specified by the benchmark.
