@@ -4,7 +4,7 @@ This is a Yarp module to estimate the pose of either an ArUco marker board and s
 The code has been designed starting from the OpenCv sample codes for estimating the pose of 
 [boards](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_board.cpp) and [single markers](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_markers.cpp).
 
-The goal of this module is to estimate the pose of the Aruco marker board located on the printed layouts provided within our benchmark:
+The goal of this module is to estimate the pose of the Aruco marker board located on the printed layouts provided by GRASP 1.0:
 
 <p align="center">
 <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/benchmark-setup2.jpg" width=300>
@@ -21,12 +21,14 @@ Information on installation is available on the main [README.md](https://github.
 
 
 ## Before running the code
-- Put the robot [in front of the benchmark layout](). The pose needs to be fixed in order to have consistent data during the acquisition.
+- Put the robot in front of the benchmark layout. The pose needs to be fixed in order to have consistent data during the acquisition.
  
 - Put the markers on the robot hand. We obtained good performance by using:
-   - Original ArUco  dictionary
-   - Marker lenghts of 0.04 m
-   - Markers id 65 and 67. You can generate and print your markers [at this page](http://chev.me/arucogen/).
+   - Original ArUco  dictionary;
+   - Marker lenghts of 0.04 m;
+   - Markers id 65 and 67. 
+   
+   You can generate and print your markers [at this page](http://chev.me/arucogen/).
     
   **Note**: Be sure to  attach the marker on the dorso of the hand as shown in the image above. The markers should also be printed on a rigid
   support in order to have stable pose estimates. We're planning to provide some printable CAD models to be mounted on the robot hand as
@@ -44,11 +46,11 @@ Information on installation is available on the main [README.md](https://github.
   
   
 ## `aruco-pose-estimation` for markers board
-This is an example of estimated pose of the marker board.
+This is an example of estimated pose of the marker board (on the left), compared to the groung truth provided by the benchmark (on the right):
 
-TODO ADD IMAGE
+TODO ADD 2 IMAGE
 
-On the left you can see the pose of the Aruco board. On the right, we draw the estimated pose of the reference frame of the benchmark layouts.
+On the left of the leftmost image you can see the estimated pose of the Aruco board. On the right of the same image, we draw the estimated pose of the reference frame of the benchmark layouts. The estimated pose is good and coeherent with the ground truth shown in the image on the right.
   
 The estimated pose is available in streaming at the port with name: `/<port-prefix>/marker-estimate/estimate:o`.
 
