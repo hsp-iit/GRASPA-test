@@ -1,7 +1,8 @@
 # RAL-benchmark-test
 <p align="center">
 <img src="https://github.com/robotology-playground/RAL-benchmark-test/blob/master/misc/benchmark-setup2.jpg" width=400>
- </p>
+</p>
+ 
 This repo provides the modules to acquire on the iCub robot all the data needed by the RAL grasping benchmark.
 In particular, the repo contains the following modules:
 - [`aruco-pose-estimation`](https://github.com/robotology-playground/RAL-benchmark-test/tree/master/src/aruco-pose-estimation) to estimate the 6D pose of the marker on the base of the layout and on the robot hand.
