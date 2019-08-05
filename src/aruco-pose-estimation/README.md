@@ -61,7 +61,7 @@ The estimated pose is available in streaming at the port with name: `/<port-pref
 Before using the module to get the pose of the robot hand, the module needs to be calibrated.
 The calibration process requires the following steps:
 - Put the robot hand in the view of the robot, so that both markers can be detected by the module:
-  TODO ADD IMAGE
+
 - Connect through `rpc` and ask the robot to execute the calibration:
   ```
   yarp rpc /hand-pose-estimation/cmd:rpc
