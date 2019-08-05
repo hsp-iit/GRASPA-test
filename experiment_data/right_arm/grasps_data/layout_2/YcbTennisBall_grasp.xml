@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <ManipulationObject name="tennis_ball">
 	<Visualization>
-		<File type="inventor">../../../RAL-benchmark-code/data/objects/YCB/tennis_ball/./nontextured.stl</File>
+		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/tennis_ball/./nontextured.stl</File>
 	</Visualization>
 	<CollisionModel>
-		<File type="inventor">../../../RAL-benchmark-code/data/objects/YCB/tennis_ball/./nontextured.stl</File>
+		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/tennis_ball/./nontextured.stl</File>
 	</CollisionModel>
 	<GraspSet name="Benchmark_Layout_2" RobotType="iCub" EndEffector="Right Hand">
 		<Grasp name="Grasp 0" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
