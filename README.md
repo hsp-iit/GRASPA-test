@@ -4,7 +4,7 @@
 </p>
 
 This repo provides the modules to acquire on the iCub robot all the data needed by **GRASP 1.0 (GRASPA is a Robotic Arm grAsping Performance benchmArk)**, a new benchmarking protocol recently proposed in the literature to evalute the performance of grasp planners.
-More information on GRASP 1.0 is available [at this link](https://github.com/robotology/GRASPA-benchmark).
+More information on GRASPA 1.0 is available [at this link](https://github.com/robotology/GRASPA-benchmark).
 
 In particular, the repo contains the following modules:
 - [`aruco-pose-estimation`](https://github.com/robotology-playground/GRASPA-test/tree/master/src/aruco-pose-estimation) to estimate the 6D pose of the marker on the base of the layout and on the robot hand.
