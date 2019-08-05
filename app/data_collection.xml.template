@@ -1,5 +1,5 @@
 <application>
-    <name>RAL Grasping Benchmark - Data Collection</name>
+    <name>GRASPA - Data Collection</name>
     <module>
     <name>aruco-pose-estimation</name>
         <parameters>--from config_base.ini</parameters>

@@ -9,7 +9,7 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-project(ral-benchmark-test
+project(graspa-test
         LANGUAGES CXX
         VERSION 0.0.0)
 
