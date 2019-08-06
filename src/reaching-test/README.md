@@ -1,13 +1,13 @@
 ## reaching-test
-This is a Yarp module to automatically collect the information required for the reachability test defined by **GRASPA 1.0**.
+This is a Yarp module to **automatically collect the information required for the reachability test** defined by **GRASPA 1.0**.
 The goal of this test is to compute scores that evaluate the reachability of the robot within the benchmark layout.
 
 <p align="center">
 <img src="https://github.com/robotology-playground/GRASPA-test/blob/master/misc/icub-reach.jpg" width=300>
 </p>
 
-The code makes the robot reach the desired pose, acquires the pose actually reached querying the forward kinematics and saves the files
-according to the benchmark convention.
+The code makes the robot **reach the desired pose, acquires the pose actually reached querying the forward kinematics and saves the files
+according to the benchmark convention**.
 [Here](https://github.com/robotology-playground/GRASPA-test/tree/master/experiment_data/right_arm/reaching_test) are
 the files filled with the data collected on the iCub.
 
@@ -16,7 +16,7 @@ the files filled with the data collected on the iCub.
 Information on installation is available on the main [README.md](https://github.com/robotology-playground/GRASPA-test#how-to-compile-the-code).
 
 ## Before running the code
-To collect coherent data, this code requires the [`aruco-pose-estimation`](https://github.com/robotology-playground/GRASPA-test/tree/master/src/aruco-pose-estimation) module to be running for estimating the ArUco board pose, and consequently,
+To collect coherent data, this code requires the [`aruco-pose-estimation`](https://github.com/robotology-playground/GRASPA-test/tree/master/src/aruco-pose-estimation) module to be running for **estimating the ArUco board pose**, and consequently,
 the pose of the reference frame of the layout.
 This is required to properly save the poses actually reached by the robot in the layout reference frame.
 
@@ -34,39 +34,40 @@ The data collection is to be done sending the commands to the robot via `rpc`:
    yarp rpc /reaching-test/cmd:rpc
    ```
 
-2. Ask the current pose to be tested:
+2. **Ask the current pose** to be tested:
    ```
    >> ask_new_pose
    ```
-   The retrieved pose is one of the poses defined within the benchmark reachability files
-   expressed in the robot reference frame, thanks to the estimate of the pose of the reference frame layout provided by the `aruco-pose-estimation` module.
+   The retrieved pose is **one of the poses defined within the benchmark reachability files**
+   **expressed in the robot reference frame**, thanks to the estimate of the pose of the reference frame layout provided by the `aruco-pose-estimation` module.
 
 
-3. Reach the pose just showed:
+3. **Reach the pose** just showed:
    ```
    >> execute_new_pose <arm>
    ```
    where `<arm>` can `right` or `left`.
-4. Repeat from 2. until the last pose is reached.
-5. When finish, save all the reached poses with the command:
+4. **Repeat** from 2. until the last pose is reached.
+5. When finish, **save all the reached poses** with the command:
    ```
    >> save_reached_poses
    ```
-   The saved poses are expressed in the layout reference frame, in order to be comparable with the benchmark desired poses.
+   The saved poses are **expressed in the layout reference frame**, in order to be comparable with the benchmark desired poses.
    These data are stored is an [xml file](https://github.com/robotology-playground/GRASPA-test/blob/master/src/reaching-test/conf/config.ini#L4) with the proper structure required by the benchmark.
 
-**Note**: The procedure needs to be executed for the three set of poses defined by GRASPA 1.0.
+**Note**: The procedure needs to be executed for the [**3 set of poses**](https://github.com/robotology/GRASPA-benchmark/tree/master/data/scenes/reachability) defined by **GRASPA 1.0**.
 
 Extra commands:
-- `help (<module_name>)` provides all the method available or the help of a specific command;
+- `help (<module_name>)` provides all the methods available or the help of a specific command;
 - `reset` makes the counter of the poses 0 to start acquisition from scratch again;
-- `increase_pose` increases the counter if you want to skip one specific pose.
+- `increase_pose` increases the counter if you want to skip one specific pose (**Note** this is just for debugging. All the poses
+needs to be tested in order to obtain correct scores).
 
 
 ## Example of collecte data
 
 <img src="https://user-images.githubusercontent.com/9597070/62217821-a6291300-b3ab-11e9-97e4-01e1b27e07e1.png" width=300> <img src="https://user-images.githubusercontent.com/9597070/62217786-93aed980-b3ab-11e9-91de-ee7f393722d6.png" width=300>
 
-On the left, a subset of the desired poses, defined by GRASPA 1.0.
+On the **left**, a subset of the **desired poses**, defined by **GRASPA 1.0**.
 
-On the right, the poses actually reached by the iCub using the right arm.
+On the **ight**, the **poses actually reached** by the iCub using the right arm.
