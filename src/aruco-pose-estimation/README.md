@@ -1,7 +1,7 @@
 ## aruco-pose-estimation
 
 This is a Yarp module to **estimate the pose of either an ArUco marker board and single Aruco Markers**.
-The code has been designed starting from the OpenCV sample codes for estimating the pose of
+The code has been designed starting from the [OpenCV](https://opencv.org/) sample codes for estimating the pose of
 [boards](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_board.cpp) and [single markers](https://github.com/opencv/opencv_contrib/blob/master/modules/aruco/samples/detect_markers.cpp).
 
 The goal of this module is to estimate the pose of the **Aruco marker board located on the printed layouts** provided by **GRASPA 1.0**:
@@ -60,7 +60,7 @@ The estimated pose is available in streaming at the port with name: `/<port-pref
 ## `aruco-pose-estimation` for markers on the robot hand
 Before using the module to get the pose of the robot hand, the **module needs to be calibrated**.
 The calibration process requires the following steps:
-- Put the r**obot hand in the view of the robot**, so that **both markers can be detected** by the module:
+- Put the **robot hand in the view of the robot**, so that **both markers can be detected** by the module:
 
 - Connect through `rpc` and ask the robot to execute the calibration:
   ```
