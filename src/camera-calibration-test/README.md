@@ -65,6 +65,6 @@ The data collection is to be done sending the commands to the robot via `rpc`:
 **Note**: The procedure needs to be executed for the [**set of poses**](https://github.com/robotology/GRASPA-benchmark/tree/master/data/scenes/camera_calibration) defined by **GRASPA 1.0**.
 
 Extra commands:
-- `help (<module_name>)` provides all the method available or the help of a specific command;
+- `help (<module_name>)` provides all the methods available or the help of a specific command;
 - `reset` makes the counter of the poses 0 to start acquisition from scratch again;
-- `increase_pose` increases the counter if you want to skip one specific pose.
+- `increase_pose` increases the counter if you want to skip one specific pose (**Note** this can be done just for debugging. All the poses needs to be acquired to obtain properly scores.).
