@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <ManipulationObject name="tennis_ball">
 	<Visualization>
-		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/tennis_ball/./nontextured.stl</File>
+		<File type="inventor">data/objects/YCB/tennis_ball/nontextured.stl</File>
 	</Visualization>
 	<CollisionModel>
-		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/tennis_ball/./nontextured.stl</File>
+		<File type="inventor">data/objects/YCB/tennis_ball/nontextured.stl</File>
 	</CollisionModel>
 	<GraspSet name="Benchmark_Layout_2" RobotType="iCub" EndEffector="Right Hand">
 		<Grasp name="Grasp 0" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
@@ -66,6 +66,7 @@
 	<Grasp name="Grasp 2" quality="1" />
 	<Grasp name="Grasp 3" quality="0" />
 	<Grasp name="Grasp 4" quality="0" />
+	<Grasp name="Grasp 5" quality="0" />
 </Grasped>
 <GraspStability>
 	<Grasp name="Grasp 0" quality="1" />
@@ -73,6 +74,7 @@
 	<Grasp name="Grasp 2" quality="1" />
 	<Grasp name="Grasp 3" quality="0" />
 	<Grasp name="Grasp 4" quality="0" />
+	<Grasp name="Grasp 5" quality="0" />
 </GraspStability>
 <ObstacleAvoidance>
 	<Grasp name="Grasp 0" quality="0" />
@@ -80,6 +82,7 @@
 	<Grasp name="Grasp 2" quality="0" />
 	<Grasp name="Grasp 3" quality="0" />
 	<Grasp name="Grasp 4" quality="0" />
+	<Grasp name="Grasp 5" quality="0" />
 </ObstacleAvoidance>
 <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="0.14416" quality_overall="0.100912"/>

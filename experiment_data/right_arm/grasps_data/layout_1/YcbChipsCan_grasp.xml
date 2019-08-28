@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <ManipulationObject name="chips_can">
 	<Visualization>
-		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/chips_can/./nontextured.stl</File>
+		<File type="inventor">data/objects/YCB/chips_can/nontextured.stl</File>
 	</Visualization>
 	<CollisionModel>
-		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/chips_can/./nontextured.stl</File>
+		<File type="inventor">data/objects/YCB/chips_can/nontextured.stl</File>
 	</CollisionModel>
 	<GraspSet name="Benchmark_Layout_1" RobotType="iCub" EndEffector="Right Hand">
 		<Grasp name="Grasp 0" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">

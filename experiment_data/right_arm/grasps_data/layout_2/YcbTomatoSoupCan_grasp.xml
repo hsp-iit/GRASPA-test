@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <ManipulationObject name="tomato_soup_can">
 	<Visualization>
-		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/tomato_soup_can/./nontextured.stl</File>
+		<File type="inventor">data/objects/YCB/tomato_soup_can/nontextured.stl</File>
 	</Visualization>
 	<CollissionModel>
-		<File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/tomato_soup_can/./nontextured.stl</File>
+		<File type="inventor">data/objects/YCB/tomato_soup_can/nontextured.stl</File>
 	</CollissionModel>
 	<GraspSet name="Benchmark_Layout_2" RobotType="iCub" EndEffector="Right Hand">
 		<Grasp name="Grasp 1" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
