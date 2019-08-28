@@ -552,7 +552,7 @@ class GraspAndStability: public RFModule, GraspAndStability_IDL
         pugi::xml_node visualization = root.append_child("Visualization");
         pugi::xml_node file_vis = visualization.append_child("File");
         file_vis.append_attribute("type") = "inventor";
-        string model_path = "../../../RAL-benchmark-code/data/objects/YCB/" + object_name +"/./nontextured.stl";
+        string model_path = "data/objects/YCB/" + object_name +"/./nontextured.stl";
         file_vis.text().set(model_path.c_str());
 
 
