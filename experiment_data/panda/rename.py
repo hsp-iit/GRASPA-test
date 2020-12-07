@@ -3,7 +3,7 @@
 import os
 import glob
 
-directory = "/home/fbottarel/workspace/docker-shared-workspace/simox/dumped_grasps"
+directory = "/home/fbottarel/workspace/docker-shared-workspace/simox/GRASPA-test/experiment_data/panda"
 planner = "dexnet"
 layout = "layout_2"
 
