@@ -6,7 +6,7 @@
     <CollisionModel>
       <File type="inventor">../../../GRASPA-benchmark/data/objects/YCB/medium_clamp/nontextured.stl</File>
     </CollisionModel>
-    <GraspSet EndEffector="panda_hand" RobotType="Panda" name="Benchmark_Layout_X">
+    <GraspSet EndEffector="panda_hand" RobotType="Panda" name="Benchmark_Layout_2">
       <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 0" quality="0">
         <Transform>
           <Matrix4x4>
