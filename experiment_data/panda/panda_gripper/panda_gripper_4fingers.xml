@@ -20,6 +20,8 @@
     </CollisionModel>
     <Child name="hand_finger_joint_1"/>
     <Child name="hand_finger_joint_2"/>
+    <Child name="hand_finger_joint_3"/>
+    <Child name="hand_finger_joint_4"/>
   </RobotNode>
 
   <RobotNode name="hand_finger_joint_1">
@@ -54,6 +56,38 @@
     </CollisionModel>
   </RobotNode>
 
+  <RobotNode name="hand_finger_joint_3">
+    <Transform>
+      <Translation x="30" y="40" z="58.4"/>
+    </Transform>
+    <Joint type="prismatic">
+      <TranslationDirection x="0" y="-1" z="0"/>
+      <Limits lo="0" hi="40" units="mm"/>
+    </Joint>
+    <Visualization>
+      <File type="Inventor">iv/finger1.iv</File>
+    </Visualization>
+    <CollisionModel>
+      <File type="Inventor">iv/finger1.iv</File>
+    </CollisionModel>
+  </RobotNode>
+
+  <RobotNode name="hand_finger_joint_4">
+    <Transform>
+      <Translation x="30" y="-40" z="58.4"/>
+    </Transform>
+    <Joint type="prismatic">
+      <TranslationDirection x="0" y="1" z="0"/>
+      <Limits lo="0" hi="40" units="mm"/>
+    </Joint>
+    <Visualization>
+      <File type="Inventor">iv/finger2.iv</File>
+    </Visualization>
+    <CollisionModel>
+      <File type="Inventor">iv/finger2.iv</File>
+    </CollisionModel>
+  </RobotNode>
+
   <RobotNode name="panda_tcp">
     <Transform>
       <Translation x="0" y="0" z="90"/>
@@ -73,6 +107,8 @@
     <Preshape name="Grasp Preshape">
       <Node name="hand_finger_joint_1" unit="mm" value="0"/>
       <Node name="hand_finger_joint_2" unit="mm" value="0"/>
+      <Node name="hand_finger_joint_3" unit="mm" value="0"/>
+      <Node name="hand_finger_joint_4" unit="mm" value="0"/>
     </Preshape>
 
     <Static>
@@ -86,6 +122,14 @@
 
     <Actor name="finger_2">
       <Node name="hand_finger_joint_2" considerCollisions="Actors" direction="1"/>
+    </Actor>
+
+    <Actor name="finger_3">
+      <Node name="hand_finger_joint_3" considerCollisions="Actors" direction="1"/>
+    </Actor>
+
+    <Actor name="finger_4">
+      <Node name="hand_finger_joint_4" considerCollisions="Actors" direction="1"/>
     </Actor>
 
   </Endeffector>
