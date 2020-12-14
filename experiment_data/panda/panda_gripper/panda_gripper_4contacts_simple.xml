@@ -26,7 +26,7 @@
 
   <RobotNode name="hand_finger_1_joint_1">
     <Transform>
-      <Translation x="-1" y="40" z="58.4"/>
+      <Translation x="-0.1" y="40" z="58.4"/>
     </Transform>
     <Joint type="prismatic">
       <TranslationDirection x="0" y="-1" z="0"/>
@@ -42,7 +42,7 @@
 
   <RobotNode name="hand_finger_1_joint_2">
     <Transform>
-      <Translation x="1" y="40" z="58.4"/>
+      <Translation x="0.1" y="40" z="58.4"/>
     </Transform>
     <Joint type="prismatic">
       <TranslationDirection x="0" y="-1" z="0"/>
@@ -58,7 +58,7 @@
 
   <RobotNode name="hand_finger_2_joint_1">
     <Transform>
-      <Translation x="1" y="-40" z="58.4"/>
+      <Translation x="0.1" y="-40" z="58.4"/>
     </Transform>
     <Joint type="prismatic">
       <TranslationDirection x="0" y="1" z="0"/>
@@ -74,7 +74,7 @@
 
   <RobotNode name="hand_finger_2_joint_2">
     <Transform>
-      <Translation x="-1" y="-40" z="58.4"/>
+      <Translation x="-0.1" y="-40" z="58.4"/>
     </Transform>
     <Joint type="prismatic">
       <TranslationDirection x="0" y="1" z="0"/>
