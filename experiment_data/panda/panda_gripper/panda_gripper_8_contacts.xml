@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<Robot RootNode="gripper_root" Type="Panda">
+	<RobotNode name="gripper_root">
+		<Transform>
+			<Translation x="0.0" y="0.0" z="0.0"/>
+		</Transform>
+		<Child name="gripper_hand"/>
+		<Child name="panda_tcp"/>
+		<Child name="panda_gcp"/>
+	</RobotNode>
+	<RobotNode name="gripper_hand">
+		<Transform>
+			<Translation x="0.0" y="0.0" z="0.0"/>
+		</Transform>
+		<Visualization>
+			<File type="Inventor">iv_8contacts/hand.iv</File>
+		</Visualization>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/hand.iv</File>
+		</CollisionModel>
+		<Child name="hand_finger_1_joint_0000"/>
+		<Child name="hand_finger_1_joint_0001"/>
+		<Child name="hand_finger_1_joint_0002"/>
+		<Child name="hand_finger_1_joint_0003"/>
+		<Child name="hand_finger_2_joint_0000"/>
+		<Child name="hand_finger_2_joint_0001"/>
+		<Child name="hand_finger_2_joint_0002"/>
+		<Child name="hand_finger_2_joint_0003"/>
+	</RobotNode>
+	<RobotNode name="hand_finger_1_joint_0000">
+		<Transform>
+			<Translation x="0.0" y="40.0" z="58.4"/>
+		</Transform>
+		<Visualization>
+			<File type="Inventor">iv_8contacts/finger.iv</File>
+		</Visualization>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0000_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_2_joint_0000">
+		<Transform>
+			<Translation x="0.0" y="-40.0" z="58.4"/>
+			<rollpitchyaw pitch="0" roll="0" units="degree" yaw="180"/>
+		</Transform>
+		<Visualization>
+			<File type="Inventor">iv_8contacts/finger.iv</File>
+		</Visualization>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0000_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_1_joint_0001">
+		<Transform>
+			<Translation x="0.0" y="40.0" z="58.4"/>
+		</Transform>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0001_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_2_joint_0001">
+		<Transform>
+			<Translation x="0.0" y="-40.0" z="58.4"/>
+			<rollpitchyaw pitch="0" roll="0" units="degree" yaw="180"/>
+		</Transform>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0001_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_1_joint_0002">
+		<Transform>
+			<Translation x="0.0" y="40.0" z="58.4"/>
+		</Transform>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0002_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_2_joint_0002">
+		<Transform>
+			<Translation x="0.0" y="-40.0" z="58.4"/>
+			<rollpitchyaw pitch="0" roll="0" units="degree" yaw="180"/>
+		</Transform>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0002_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_1_joint_0003">
+		<Transform>
+			<Translation x="0.0" y="40.0" z="58.4"/>
+		</Transform>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0003_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="hand_finger_2_joint_0003">
+		<Transform>
+			<Translation x="0.0" y="-40.0" z="58.4"/>
+			<rollpitchyaw pitch="0" roll="0" units="degree" yaw="180"/>
+		</Transform>
+		<CollisionModel>
+			<File type="Inventor">iv_8contacts/finger_1_0003_collision.iv</File>
+		</CollisionModel>
+		<Joint type="prismatic">
+			<TranslationDirection x="0" y="-1" z="0"/>
+			<Limits hi="40" lo="0" units="mm"/>
+		</Joint>
+	</RobotNode>
+	<RobotNode name="panda_tcp">
+		<Transform>
+			<Translation x="0" y="0" z="105"/>
+		</Transform>
+	</RobotNode>
+	<RobotNode name="panda_gcp">
+		<Transform>
+			<Translation x="0" y="0" z="105"/>
+		</Transform>
+	</RobotNode>
+	<Endeffector base="gripper_root" gcp="panda_gcp" name="Panda Hand" tcp="panda_tcp">
+		<Preshape name="Grasp Preshape">
+			<Node name="hand_finger_1_joint_0000" unit="mm" value="0"/>
+			<Node name="hand_finger_1_joint_0001" unit="mm" value="0"/>
+			<Node name="hand_finger_1_joint_0002" unit="mm" value="0"/>
+			<Node name="hand_finger_1_joint_0003" unit="mm" value="0"/>
+			<Node name="hand_finger_2_joint_0000" unit="mm" value="0"/>
+			<Node name="hand_finger_2_joint_0001" unit="mm" value="0"/>
+			<Node name="hand_finger_2_joint_0002" unit="mm" value="0"/>
+			<Node name="hand_finger_2_joint_0003" unit="mm" value="0"/>
+		</Preshape>
+		<Static>
+			<Node name="gripper_root"/>
+			<Node name="gripper_hand"/>
+		</Static>
+		<Actor name="hand_finger_1_joint_0000">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_1_joint_0000"/>
+		</Actor>
+		<Actor name="hand_finger_1_joint_0001">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_1_joint_0001"/>
+		</Actor>
+		<Actor name="hand_finger_1_joint_0002">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_1_joint_0002"/>
+		</Actor>
+		<Actor name="hand_finger_1_joint_0003">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_1_joint_0003"/>
+		</Actor>
+		<Actor name="hand_finger_2_joint_0000">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_2_joint_0000"/>
+		</Actor>
+		<Actor name="hand_finger_2_joint_0001">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_2_joint_0001"/>
+		</Actor>
+		<Actor name="hand_finger_2_joint_0002">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_2_joint_0002"/>
+		</Actor>
+		<Actor name="hand_finger_2_joint_0003">
+			<Node considerCollisions="Actors" direction="1" name="hand_finger_2_joint_0003"/>
+		</Actor>
+	</Endeffector>
+</Robot>
