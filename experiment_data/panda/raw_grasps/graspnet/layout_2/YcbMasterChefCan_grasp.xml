@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<grasp_data>
+  <ManipulationObject name="master_chef_can">
+    <Visualization>
+      <File type="inventor">data/objects/YCB/master_chef_can/nontextured.stl</File>
+    </Visualization>
+    <CollisionModel>
+      <File type="inventor">data/objects/YCB/master_chef_can/nontextured.stl</File>
+    </CollisionModel>
+    <GraspSet EndEffector="Panda Hand" RobotType="Panda" name="Benchmark_Layout_2">
+  </ManipulationObject>
+  <Graspable quality="0"/>
+  <Grasped>
+  </Grasped>
+  <GraspStability>
+  </GraspStability>
+  <ObstacleAvoidance>
+  </ObstacleAvoidance>
+</grasp_data>
