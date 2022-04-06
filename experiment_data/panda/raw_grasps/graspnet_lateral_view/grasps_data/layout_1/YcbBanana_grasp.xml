@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<grasp_data>
+  <ManipulationObject name="banana">
+    <Visualization>
+      <File type="inventor">data/objects/YCB/banana/nontextured.stl</File>
+    </Visualization>
+    <CollisionModel>
+      <File type="inventor">data/objects/YCB/banana/nontextured.stl</File>
+    </CollisionModel>
+    <GraspSet EndEffector="Panda Hand" RobotType="Panda" name="Benchmark_Layout_1">
+    </GraspSet>
+  </ManipulationObject>
+  <Graspable quality="0"/>
+  <Grasped>
+  </Grasped>
+  <GraspStability>
+  </GraspStability>
+  <ObstacleAvoidance>
+  </ObstacleAvoidance>
+</grasp_data>
