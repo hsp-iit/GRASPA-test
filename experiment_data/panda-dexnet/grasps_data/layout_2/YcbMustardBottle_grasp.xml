@@ -1,4 +1,5 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
+<grasp_data>
   <ManipulationObject name="mustard_bottle">
     <Visualization>
       <File type="inventor">data/objects/YCB/mustard_bottle/nontextured.stl</File>
@@ -81,10 +82,11 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
-<ComputedQuality>
+  <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="0.120145" quality_overall="0.0841012"/>
     <Grasp name="Grasp 1" quality_collision_free="0.104591" quality_overall="0.0522954"/>
     <Grasp name="Grasp 2" quality_collision_free="0.0268752" quality_overall="0.0107501"/>
     <Grasp name="Grasp 3" quality_collision_free="0" quality_overall="0"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0682191" quality_overall="0.0341095"/>
-</ComputedQuality>
+  </ComputedQuality>
+</grasp_data>

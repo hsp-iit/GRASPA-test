@@ -1,4 +1,5 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
+<grasp_data>
   <ManipulationObject name="pear">
     <Visualization>
       <File type="inventor">data/objects/YCB/pear/nontextured.stl</File>
@@ -81,10 +82,11 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
-<ComputedQuality>
+  <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="1.71804e-08" quality_overall="1.54623e-08"/>
     <Grasp name="Grasp 1" quality_collision_free="0.0675069" quality_overall="0.0675069"/>
     <Grasp name="Grasp 2" quality_collision_free="0.17959" quality_overall="0.0718359"/>
     <Grasp name="Grasp 3" quality_collision_free="0.0751247" quality_overall="0.0751247"/>
     <Grasp name="Grasp 4" quality_collision_free="0.201696" quality_overall="0.100848"/>
-</ComputedQuality>
+  </ComputedQuality>
+</grasp_data>

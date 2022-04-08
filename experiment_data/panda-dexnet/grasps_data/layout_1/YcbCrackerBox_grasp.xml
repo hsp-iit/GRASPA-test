@@ -1,4 +1,5 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
+<grasp_data>
   <ManipulationObject name="cracker_box">
     <Visualization>
       <File type="inventor">data/objects/YCB/cracker_box/nontextured.stl</File>
@@ -81,10 +82,11 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
-<ComputedQuality>
+  <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="0.0618014" quality_overall="0.0494411"/>
     <Grasp name="Grasp 1" quality_collision_free="0" quality_overall="0"/>
     <Grasp name="Grasp 2" quality_collision_free="2.55703e-08" quality_overall="1.02281e-08"/>
     <Grasp name="Grasp 3" quality_collision_free="0.0350768" quality_overall="0.0210461"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0157099" quality_overall="0.00942595"/>
-</ComputedQuality>
+  </ComputedQuality>
+</grasp_data>
