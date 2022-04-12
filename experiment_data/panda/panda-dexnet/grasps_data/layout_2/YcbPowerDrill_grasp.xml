@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<grasp_data>
   <ManipulationObject name="power_drill">
     <Visualization>
       <File type="inventor">data/objects/YCB/power_drill/nontextured.stl</File>
@@ -88,3 +89,4 @@
     <Grasp name="Grasp 3" quality_collision_free="0.0704939" quality_overall="0.0422963"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0562679" quality_overall="0.0562679"/>
 </ComputedQuality>
+</grasp_data>

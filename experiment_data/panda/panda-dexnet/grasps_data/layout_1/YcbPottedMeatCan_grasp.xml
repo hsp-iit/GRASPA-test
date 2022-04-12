@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<grasp_data>
   <ManipulationObject name="potted_meat_can">
     <Visualization>
       <File type="inventor">data/objects/YCB/potted_meat_can/nontextured.stl</File>
@@ -88,3 +89,4 @@
     <Grasp name="Grasp 3" quality_collision_free="0.0775569" quality_overall="0.0698012"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0602234" quality_overall="0.0602234"/>
 </ComputedQuality>
+</grasp_data>

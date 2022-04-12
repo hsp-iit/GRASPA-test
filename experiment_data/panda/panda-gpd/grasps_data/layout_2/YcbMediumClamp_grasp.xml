@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<grasp_data>
   <ManipulationObject name="medium_clamp">
     <Visualization>
       <File type="inventor">data/objects/YCB/medium_clamp/nontextured.stl</File>
@@ -81,3 +82,4 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
+</grasp_data>

@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<grasp_data>
   <ManipulationObject name="gelatin_box">
     <Visualization>
       <File type="inventor">data/objects/YCB/gelatin_box/nontextured.stl</File>
@@ -81,3 +82,4 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
+</grasp_data>
