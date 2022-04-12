@@ -10,10 +10,8 @@
     <GraspSet EndEffector="Panda Hand" RobotType="Panda" name="Benchmark_Layout_0">
     </GraspSet>
   </ManipulationObject>
-  <Grasped>
-  </Grasped>
-  <GraspStability>
-  </GraspStability>
-  <ObstacleAvoidance>
-  </ObstacleAvoidance>
+  <Graspable quality="0"/>
+  <Grasped/>
+  <GraspStability/>
+  <ObstacleAvoidance/>
 </grasp_data>

@@ -11,10 +11,7 @@
     </GraspSet>
   </ManipulationObject>
   <Graspable quality="0"/>
-  <Grasped>
-  </Grasped>
-  <GraspStability>
-  </GraspStability>
-  <ObstacleAvoidance>
-  </ObstacleAvoidance>
+  <Grasped/>
+  <GraspStability/>
+  <ObstacleAvoidance/>
 </grasp_data>

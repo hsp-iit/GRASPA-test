@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<grasp_data>
+  <ManipulationObject name="tennis_ball">
+    <Visualization>
+      <File type="inventor">data/objects/YCB/tennis_ball/nontextured.stl</File>
+    </Visualization>
+    <CollisionModel>
+      <File type="inventor">data/objects/YCB/tennis_ball/nontextured.stl</File>
+    </CollisionModel>
+    <GraspSet EndEffector="Panda Hand" RobotType="Panda" name="Benchmark_Layout_2">
+      <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 0" quality="0">
+        <Transform>
+          <Matrix4x4>
+            <row1 c1="0.942375076463713" c2="0.01901445121102166" c3="0.3340174634733256" c4="-142.3799561679105"/>
+            <row2 c1="0.0994084014698115" c2="-0.9692069045541898" c3="-0.22529080292302595" c4="49.07084253906646"/>
+            <row3 c1="0.31944825085955236" c2="0.24551257973804233" c3="-0.9152466269881266" c4="19.043093824639353"/>
+            <row4 c1="0.0" c2="0.0" c3="0.0" c4="1.0"/>
+          </Matrix4x4>
+        </Transform>
+      </Grasp>
+      <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 1" quality="0">
+        <Transform>
+          <Matrix4x4>
+            <row1 c1="0.970695146300808" c2="0.031120489602849924" c3="0.23829067979031615" c4="-139.250874175898"/>
+            <row2 c1="0.04841260464016181" c2="-0.9965736484636355" c3="-0.06706103861283978" c4="46.16270639135001"/>
+            <row3 c1="0.23538723979860815" c2="0.07663209715749866" c3="-0.9688758274542901" c4="18.45166851111972"/>
+            <row4 c1="0.0" c2="0.0" c3="0.0" c4="1.0"/>
+          </Matrix4x4>
+        </Transform>
+      </Grasp>
+      <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 2" quality="0">
+        <Transform>
+          <Matrix4x4>
+            <row1 c1="0.264270203801142" c2="-0.9591732596339935" c3="0.10073687202808518" c4="-163.38076931622163"/>
+            <row2 c1="-0.7374934730217538" c2="-0.268285392019066" c3="-0.6197792556059682" c4="58.54319139909664"/>
+            <row3 c1="0.6215019200559359" c2="0.08949640457736883" c3="-0.7782838537028179" c4="20.3823512919709"/>
+            <row4 c1="0.0" c2="0.0" c3="0.0" c4="1.0"/>
+          </Matrix4x4>
+        </Transform>
+      </Grasp>
+      <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 3" quality="0">
+        <Transform>
+          <Matrix4x4>
+            <row1 c1="-0.5350902795483672" c2="0.8282033396534415" c3="0.16660618511849326" c4="-157.49359297675713"/>
+            <row2 c1="0.47670265375333093" c2="0.4588289473071717" c3="-0.7498203631654221" c4="47.254283418645684"/>
+            <row3 c1="-0.6974474694465406" c2="-0.3217999771595394" c3="-0.6403216395396443" c4="35.23484522345145"/>
+            <row4 c1="0.0" c2="0.0" c3="0.0" c4="1.0"/>
+          </Matrix4x4>
+        </Transform>
+      </Grasp>
+      <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 4" quality="0">
+        <Transform>
+          <Matrix4x4>
+            <row1 c1="0.9251236884740334" c2="-0.15740452382651757" c3="0.3454996047800165" c4="-133.52066876924738"/>
+            <row2 c1="-0.17223032991840534" c2="-0.9849782869904108" c3="0.012429304631953058" c4="51.94435207868325"/>
+            <row3 c1="0.3383531800949971" c2="-0.07100415506422066" c3="-0.9383365789966941" c4="19.515786792903555"/>
+            <row4 c1="0.0" c2="0.0" c3="0.0" c4="1.0"/>
+          </Matrix4x4>
+        </Transform>
+      </Grasp>
+    </GraspSet>
+  </ManipulationObject>
+  <Graspable quality="1"/>
+  <Grasped>
+    <Grasp name="Grasp 0" quality="1"/>
+    <Grasp name="Grasp 1" quality="1"/>
+    <Grasp name="Grasp 2" quality="0"/>
+    <Grasp name="Grasp 3" quality="1"/>
+    <Grasp name="Grasp 4" quality="1"/>
+  </Grasped>
+  <GraspStability>
+    <Grasp name="Grasp 0" quality="1.0"/>
+    <Grasp name="Grasp 1" quality="1.0"/>
+    <Grasp name="Grasp 2" quality="0.0"/>
+    <Grasp name="Grasp 3" quality="1.0"/>
+    <Grasp name="Grasp 4" quality="1.0"/>
+  </GraspStability>
+  <ObstacleAvoidance>
+    <Grasp name="Grasp 0" quality="0"/>
+    <Grasp name="Grasp 1" quality="0"/>
+    <Grasp name="Grasp 2" quality="0"/>
+    <Grasp name="Grasp 3" quality="0"/>
+    <Grasp name="Grasp 4" quality="0"/>
+  </ObstacleAvoidance>
+</grasp_data>
