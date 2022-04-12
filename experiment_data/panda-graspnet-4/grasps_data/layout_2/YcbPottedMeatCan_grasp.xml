@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <grasp_data>
-  <ManipulationObject name="potted_meat">
+  <ManipulationObject name="potted_meat_can">
     <Visualization>
-      <File type="inventor">data/objects/YCB/potted_meat/nontextured.stl</File>
+      <File type="inventor">data/objects/YCB/potted_meat_can/nontextured.stl</File>
     </Visualization>
     <CollisionModel>
-      <File type="inventor">data/objects/YCB/potted_meat/nontextured.stl</File>
+      <File type="inventor">data/objects/YCB/potted_meat_can/nontextured.stl</File>
     </CollisionModel>
     <GraspSet EndEffector="Panda Hand" RobotType="Panda" name="Benchmark_Layout_2">
       <Grasp Creation="auto" Preshape="Grasp Preshape" name="Grasp 0" quality="0">
