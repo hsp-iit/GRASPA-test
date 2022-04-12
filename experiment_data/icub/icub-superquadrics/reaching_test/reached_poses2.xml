@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+<Scene name="Set_Poses_2">
+	<ManipulationObject name="Reachable_frame00">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.002" c2="1.000" c3="0.006" c4="-1.617" />
+					<row2 c1="0.999" c2="-0.002" c3="-0.033" c4="2.612" />
+					<row3 c1="-0.033" c2="0.006" c3="-0.999" c4="134.317" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame01">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.154" c2="0.986" c3="-0.059" c4="-187.084" />
+					<row2 c1="0.988" c2="0.153" c3="-0.026" c4="1.177" />
+					<row3 c1="-0.017" c2="-0.063" c3="-0.998" c4="138.392" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame02">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.878" c2="0.458" c3="-0.141" c4="-369.412" />
+					<row2 c1="0.476" c2="0.867" c3="-0.147" c4="-8.422" />
+					<row3 c1="0.055" c2="-0.196" c3="-0.979" c4="139.133" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame03">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.999" c2="0.031" c3="0.017" c4="-526.362" />
+					<row2 c1="-0.018" c2="-0.019" c3="-1.000" c4="-3.840" />
+					<row3 c1="-0.031" c2="-0.999" c3="0.020" c4="151.315" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame10">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.000" c2="1.000" c3="-0.003" c4="0.713" />
+					<row2 c1="1.000" c2="0.000" c3="-0.001" c4="126.672" />
+					<row3 c1="-0.001" c2="-0.003" c3="-1.000" c4="138.894" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame11">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.076" c2="0.997" c3="-0.033" c4="-184.180" />
+					<row2 c1="0.997" c2="0.076" c3="-0.003" c4="126.451" />
+					<row3 c1="-0.000" c2="-0.033" c3="-0.999" c4="139.204" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame12">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.553" c2="0.824" c3="-0.120" c4="-369.569" />
+					<row2 c1="0.833" c2="0.549" c3="-0.067" c4="122.538" />
+					<row3 c1="0.011" c2="-0.137" c3="-0.990" c4="140.925" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame13">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.971" c2="0.215" c3="-0.110" c4="-531.282" />
+					<row2 c1="0.218" c2="0.976" c3="-0.017" c4="119.451" />
+					<row3 c1="0.103" c2="-0.040" c3="-0.994" c4="143.065" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame20">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.065" c2="0.998" c3="0.016" c4="1.577" />
+					<row2 c1="0.998" c2="-0.064" c3="-0.020" c4="249.670" />
+					<row3 c1="-0.019" c2="0.017" c3="-1.000" c4="137.776" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame21">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.007" c2="1.000" c3="-0.001" c4="-181.233" />
+					<row2 c1="1.000" c2="0.007" c3="-0.004" c4="250.084" />
+					<row3 c1="-0.004" c2="-0.001" c3="-1.000" c4="137.860" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame22">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.211" c2="0.975" c3="-0.070" c4="-366.562" />
+					<row2 c1="0.977" c2="0.209" c3="-0.032" c4="249.399" />
+					<row3 c1="-0.016" c2="-0.076" c3="-0.997" c4="139.329" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame23">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.740" c2="0.613" c3="-0.277" c4="-494.868" />
+					<row2 c1="0.672" c2="0.686" c3="-0.280" c4="204.631" />
+					<row3 c1="0.018" c2="-0.393" c3="-0.919" c4="155.140" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame30">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.547" c2="0.799" c3="-0.250" c4="-40.360" />
+					<row2 c1="0.831" c2="-0.485" c3="0.270" c4="304.390" />
+					<row3 c1="0.095" c2="-0.356" c3="-0.930" c4="152.895" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame31">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.019" c2="1.000" c3="0.022" c4="-182.753" />
+					<row2 c1="0.992" c2="0.016" c3="0.129" c4="341.698" />
+					<row3 c1="0.129" c2="0.025" c3="-0.991" c4="142.987" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame32">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.256" c2="-0.925" c3="-0.280" c4="-342.936" />
+					<row2 c1="0.885" c2="-0.341" c3="0.318" c4="321.806" />
+					<row3 c1="-0.390" c2="-0.166" c3="0.906" c4="163.088" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<ManipulationObject name="Reachable_frame33">
+		<File>objects/frame.xml</File>
+		<GlobalPose>
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="-0.480" c2="0.462" c3="-0.746" c4="-454.657" />
+					<row2 c1="0.877" c2="0.229" c3="-0.423" c4="254.768" />
+					<row3 c1="-0.025" c2="-0.857" c3="-0.515" c4="168.092" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</GlobalPose>
+	</ManipulationObject>
+	<Obstacle name='Table'>
+			<Visualization>
+			<File type='inventor'>objects/iv/layout_base.iv</File>
+			<UseAsCollisionModel/>
+		</Visualization>
+			<GlobalPose>
+				<Transform>
+					<Matrix4x4>
+						<row1 c1='1' c2='0' c3='0' c4='-267'/>
+						<row2 c1='0' c2='1' c3='0' c4='178'/>
+						<row3 c1='0' c2='0' c3='1' c4='-2'/>
+						<row4 c1='0' c2='0' c3='0' c4='1'/>
+					</Matrix4x4>
+				</Transform>
+			</GlobalPose>
+		</Obstacle>
+		<Obstacle name='Frame'>
+			<Visualization>
+			<File>data/objects/misc/frame.wrl</File>
+		</Visualization>
+			<GlobalPose>
+				<Transform>
+					<Matrix4x4>
+						<row1 c1='1' c2='0' c3='0' c4='-0'/>
+						<row2 c1='0=' c2='1' c3='0' c4='-0'/>
+						<row3 c1='0' c2='0' c3='1' c4='0'/>
+						<row4 c1='0' c2='0' c3='0' c4='1'/>
+					</Matrix4x4>
+				</Transform>
+			</GlobalPose>
+		</Obstacle>
+</Scene>

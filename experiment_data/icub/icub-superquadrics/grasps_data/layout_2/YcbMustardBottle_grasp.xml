@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<ManipulationObject name="mustard_bottle">
+	<Visualization>
+		<File type="inventor">data/objects/YCB/mustard_bottle/nontextured.stl</File>
+	</Visualization>
+	<CollisionModel>
+		<File type="inventor">data/objects/YCB/mustard_bottle/nontextured.stl</File>
+	</CollisionModel>
+	<GraspSet name="Benchmark_Layout_2" RobotType="iCub" EndEffector="Right Hand">
+		<Grasp name="Grasp 0" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.671" c2="-0.040" c3="-0.740" c4="-46.779" />
+					<row2 c1="0.741" c2="0.040" c3="0.670" c4="260.974" />
+					<row3 c1="0.002" c2="-0.998" c3="0.057" c4="79.178" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</Grasp>
+		<Grasp name="Grasp 1" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.638" c2="-0.040" c3="-0.769" c4="-55.953" />
+					<row2 c1="0.770" c2="0.040" c3="0.636" c4="265.623" />
+					<row3 c1="0.005" c2="-0.998" c3="0.057" c4="78.227" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</Grasp>
+		<Grasp name="Grasp 2" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.695" c2="-0.040" c3="-0.718" c4="-53.682" />
+					<row2 c1="0.719" c2="0.040" c3="0.694" c4="254.723" />
+					<row3 c1="0.000" c2="-0.998" c3="0.057" c4="80.412" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</Grasp>
+		<Grasp name="Grasp 3" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.658" c2="-0.040" c3="-0.752" c4="-55.352" />
+					<row2 c1="0.753" c2="0.040" c3="0.656" c4="261.131" />
+					<row3 c1="0.003" c2="-0.998" c3="0.057" c4="89.718" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</Grasp>
+		<Grasp name="Grasp 4" quality="0" Creation="Simox - GraspStudio - GraspWrenchSpace" Preshape="Grasp Preshape">
+			<Transform>
+				<Matrix4x4>
+					<row1 c1="0.703" c2="-0.040" c3="-0.710" c4="-50.213" />
+					<row2 c1="0.711" c2="0.040" c3="0.702" c4="261.158" />
+					<row3 c1="-0.000" c2="-0.998" c3="0.057" c4="78.248" />
+					<row4 c1="0" c2="0" c3="0" c4="1" />
+				</Matrix4x4>
+			</Transform>
+		</Grasp>
+	</GraspSet>
+</ManipulationObject>
+<Graspable quality="1" />
+<Grasped>
+	<Grasp name="Grasp 0" quality="1" />
+	<Grasp name="Grasp 1" quality="1" />
+	<Grasp name="Grasp 2" quality="1" />
+	<Grasp name="Grasp 3" quality="1" />
+	<Grasp name="Grasp 4" quality="1" />
+</Grasped>
+<GraspStability>
+	<Grasp name="Grasp 0" quality="1" />
+	<Grasp name="Grasp 1" quality="1" />
+	<Grasp name="Grasp 2" quality="1" />
+	<Grasp name="Grasp 3" quality="1" />
+	<Grasp name="Grasp 4" quality="1" />
+</GraspStability>
+<ObstacleAvoidance>
+	<Grasp name="Grasp 0" quality="0" />
+	<Grasp name="Grasp 1" quality="0" />
+	<Grasp name="Grasp 2" quality="0" />
+	<Grasp name="Grasp 3" quality="0" />
+	<Grasp name="Grasp 4" quality="0" />
+</ObstacleAvoidance>
+<ComputedQuality>
+    <Grasp name="Grasp 0" quality_collision_free="0.344649" quality_overall="0.241255"/>
+    <Grasp name="Grasp 1" quality_collision_free="0.224623" quality_overall="0.0449247"/>
+    <Grasp name="Grasp 2" quality_collision_free="0.260721" quality_overall="0.0782163"/>
+    <Grasp name="Grasp 3" quality_collision_free="0.24088" quality_overall="0.144528"/>
+    <Grasp name="Grasp 4" quality_collision_free="0.217189" quality_overall="0.0434377"/>
+</ComputedQuality>
