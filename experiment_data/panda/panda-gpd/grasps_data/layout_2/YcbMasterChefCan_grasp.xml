@@ -1,4 +1,12 @@
+<<<<<<< HEAD
+<<<<<<< HEAD:experiment_data/panda/panda-gpd/grasps_data/layout_2/YcbMasterChefCan_grasp.xml
 <?xml version="1.0" ?>
+=======
+<?xml version="1.0" encoding="utf-8"?>
+>>>>>>> upstream/master:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbMasterChefCan_grasp.xml
+=======
+<?xml version="1.0" encoding="utf-8"?>
+>>>>>>> upstream/master
 <grasp_data>
   <ManipulationObject name="master_chef_can">
     <Visualization>

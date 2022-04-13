@@ -1,4 +1,8 @@
+<<<<<<< HEAD:experiment_data/panda/panda-gpd/grasps_data/layout_0/YcbGelatinBox_grasp.xml
 <?xml version="1.0" ?>
+=======
+<?xml version="1.0" encoding="utf-8"?>
+>>>>>>> upstream/master:experiment_data/panda-gpd/grasps_data/layout_0/YcbGelatinBox_grasp.xml
 <grasp_data>
   <ManipulationObject name="gelatin_box">
     <Visualization>

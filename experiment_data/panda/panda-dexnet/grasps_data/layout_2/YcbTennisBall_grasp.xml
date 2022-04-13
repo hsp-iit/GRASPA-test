@@ -1,4 +1,8 @@
+<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbTennisBall_grasp.xml
 <?xml version="1.0" ?>
+=======
+<?xml version="1.0" encoding="utf-8"?>
+>>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbTennisBall_grasp.xml
 <grasp_data>
   <ManipulationObject name="tennis_ball">
     <Visualization>
@@ -82,11 +86,15 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
-<ComputedQuality>
+  <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="0.140895" quality_overall="0.0845371"/>
     <Grasp name="Grasp 1" quality_collision_free="0.0117574" quality_overall="0.0058787"/>
     <Grasp name="Grasp 2" quality_collision_free="0.0880138" quality_overall="0.0880138"/>
     <Grasp name="Grasp 3" quality_collision_free="0.0851389" quality_overall="0.0595972"/>
     <Grasp name="Grasp 4" quality_collision_free="0.10126" quality_overall="0.0911342"/>
+<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbTennisBall_grasp.xml
 </ComputedQuality>
+=======
+  </ComputedQuality>
+>>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbTennisBall_grasp.xml
 </grasp_data>

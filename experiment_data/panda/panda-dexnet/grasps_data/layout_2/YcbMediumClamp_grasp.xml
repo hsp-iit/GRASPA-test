@@ -1,4 +1,8 @@
+<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbMediumClamp_grasp.xml
 <?xml version="1.0" ?>
+=======
+<?xml version="1.0" encoding="utf-8"?>
+>>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbMediumClamp_grasp.xml
 <grasp_data>
   <ManipulationObject name="medium_clamp">
     <Visualization>
@@ -82,11 +86,15 @@
     <Grasp name="Grasp 3" quality="0"/>
     <Grasp name="Grasp 4" quality="0"/>
   </ObstacleAvoidance>
-<ComputedQuality>
+  <ComputedQuality>
     <Grasp name="Grasp 0" quality_collision_free="0.0534476" quality_overall="0.0267238"/>
     <Grasp name="Grasp 1" quality_collision_free="0.247845" quality_overall="0.247845"/>
     <Grasp name="Grasp 2" quality_collision_free="0.081475" quality_overall="0.0244425"/>
     <Grasp name="Grasp 3" quality_collision_free="7.63365e-09" quality_overall="3.05346e-09"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0336325" quality_overall="0.0235428"/>
+<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbMediumClamp_grasp.xml
 </ComputedQuality>
+=======
+  </ComputedQuality>
+>>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbMediumClamp_grasp.xml
 </grasp_data>
