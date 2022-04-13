@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<grasp_data>
+  <ManipulationObject name="hammer">
+    <Visualization>
+      <File type="inventor">data/objects/YCB/hammer/nontextured.stl</File>
+    </Visualization>
+    <CollisionModel>
+      <File type="inventor">data/objects/YCB/hammer/nontextured.stl</File>
+    </CollisionModel>
+    <GraspSet EndEffector="Panda Hand" RobotType="Panda" name="Benchmark_Layout_1">
+    </GraspSet>
+  </ManipulationObject>
+  <Graspable quality="0"/>
+  <Grasped/>
+  <GraspStability/>
+  <ObstacleAvoidance/>
+</grasp_data>
