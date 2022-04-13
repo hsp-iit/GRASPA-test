@@ -1,8 +1,4 @@
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbPowerDrill_grasp.xml
-<?xml version="1.0" ?>
-=======
 <?xml version="1.0" encoding="utf-8"?>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbPowerDrill_grasp.xml
 <grasp_data>
   <ManipulationObject name="power_drill">
     <Visualization>
@@ -92,9 +88,5 @@
     <Grasp name="Grasp 2" quality_collision_free="0.0343068" quality_overall="0.0274455"/>
     <Grasp name="Grasp 3" quality_collision_free="0.0704939" quality_overall="0.0422963"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0562679" quality_overall="0.0562679"/>
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbPowerDrill_grasp.xml
-</ComputedQuality>
-=======
   </ComputedQuality>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbPowerDrill_grasp.xml
 </grasp_data>

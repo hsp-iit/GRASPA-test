@@ -1,8 +1,4 @@
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbScissors_grasp.xml
-<?xml version="1.0" ?>
-=======
 <?xml version="1.0" encoding="utf-8"?>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbScissors_grasp.xml
 <grasp_data>
   <ManipulationObject name="scissors">
     <Visualization>
@@ -92,9 +88,5 @@
     <Grasp name="Grasp 2" quality_collision_free="0.0999992" quality_overall="0.0799994"/>
     <Grasp name="Grasp 3" quality_collision_free="4.52639e-08" quality_overall="3.62111e-08"/>
     <Grasp name="Grasp 4" quality_collision_free="0.0439059" quality_overall="0.0439059"/>
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbScissors_grasp.xml
-</ComputedQuality>
-=======
   </ComputedQuality>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbScissors_grasp.xml
 </grasp_data>

@@ -1,8 +1,4 @@
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbPear_grasp.xml
-<?xml version="1.0" ?>
-=======
 <?xml version="1.0" encoding="utf-8"?>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbPear_grasp.xml
 <grasp_data>
   <ManipulationObject name="pear">
     <Visualization>
@@ -92,9 +88,5 @@
     <Grasp name="Grasp 2" quality_collision_free="0.17959" quality_overall="0.0718359"/>
     <Grasp name="Grasp 3" quality_collision_free="0.0751247" quality_overall="0.0751247"/>
     <Grasp name="Grasp 4" quality_collision_free="0.201696" quality_overall="0.100848"/>
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_2/YcbPear_grasp.xml
-</ComputedQuality>
-=======
   </ComputedQuality>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_2/YcbPear_grasp.xml
 </grasp_data>

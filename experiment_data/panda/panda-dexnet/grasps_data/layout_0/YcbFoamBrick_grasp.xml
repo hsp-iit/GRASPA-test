@@ -1,8 +1,4 @@
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_0/YcbFoamBrick_grasp.xml
-<?xml version="1.0" ?>
-=======
 <?xml version="1.0" encoding="utf-8"?>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_0/YcbFoamBrick_grasp.xml
 <grasp_data>
   <ManipulationObject name="foam_brick">
     <Visualization>
@@ -92,9 +88,5 @@
     <Grasp name="Grasp 2" quality_collision_free="0.0910579" quality_overall="0.0819521"/>
     <Grasp name="Grasp 3" quality_collision_free="0" quality_overall="0"/>
     <Grasp name="Grasp 4" quality_collision_free="0.142083" quality_overall="0.142083"/>
-<<<<<<< HEAD:experiment_data/panda/panda-dexnet/grasps_data/layout_0/YcbFoamBrick_grasp.xml
-</ComputedQuality>
-=======
   </ComputedQuality>
->>>>>>> upstream/master:experiment_data/panda-dexnet/grasps_data/layout_0/YcbFoamBrick_grasp.xml
 </grasp_data>
