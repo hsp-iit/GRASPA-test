@@ -135,12 +135,12 @@
 	</RobotNode>
 	<RobotNode name="panda_tcp">
 		<Transform>
-			<Translation x="0" y="0" z="95"/>
+			<Translation x="0" y="0" z="105"/>
 		</Transform>
 	</RobotNode>
 	<RobotNode name="panda_gcp">
 		<Transform>
-			<Translation x="0" y="0" z="95"/>
+			<Translation x="0" y="0" z="105"/>
 		</Transform>
 	</RobotNode>
 	<Endeffector base="gripper_root" gcp="panda_gcp" name="Panda Hand" tcp="panda_tcp">
