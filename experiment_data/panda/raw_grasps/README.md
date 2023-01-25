@@ -49,8 +49,8 @@ For sake of clarity, the main parameters of the file are described in the table:
 
 | Parameter | Description | 
 | --- | --- | 
-**object** | the name of the target object|
-**GRASPA_board_pose** | the position of the GRASPA board w.r.t. the robot reference frame |
-**grasp_pose**  | the position of the gripper w.r.t. the robot reference frame |
-**grasped_score** | grasped quality score (defined in GRASPA)|
-**stability_score** | grasp stability score (defined in GRASPA)|
+**object** | Name of the target object|
+**GRASPA_board_pose** | Position of the GRASPA board w.r.t. the robot reference frame |
+**grasp_pose**  | Position of the gripper w.r.t. the robot reference frame |
+**grasped_score** | Grasped quality score (defined in GRASPA)|
+**stability_score** | Grasp stability score (defined in GRASPA)|
