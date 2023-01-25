@@ -1,12 +1,13 @@
 
-This folder collects all the data in order to replicate the grasping poses that are executed in the trials for each layout and for each objects. 
-For each trial the data are saved in a distinct file grasp_<object>_00<N>.json  where <object> is the name of the target object and <N> (from 0 to 4) is the trial number.
-For example, the file in the path \dexnet\layout_0\grasp_foam_brick.json store the data for the first trial to grab the foam brick, the grasping pose is identified by dexnet in the Layout 0.
+The raw data of the grasping poses, which are executed in the experiments, are collected in this folder. 
+For each grasp trial, the data are saved in a distinct file `grasp_<object>_00<N>.json`,  where `<object>` is the name of the target object and `<N>` (from 0 to 4) is the trial number.
+For example, the file in the path `\dexnet\layout_0\grasp_foam_brick.json` stores the data of the first trial to grab the foam brick, the grasping pose is identified by Dexnet in the Layout 0.
 
-In each file the data should be arranged in a structure as shown here:  
+In each file, the data are arranged in a structure as shown here:  
 
+```json
 {
-"GRASPA_board_pose":
+ "GRASPA_board_pose":
   {
   "position": 
     {
@@ -28,7 +29,7 @@ In each file the data should be arranged in a structure as shown here:
   {
   "position": 
     {
-    "y": 0.14970505169335224, 
+    "y": 0.14970505169335224,
     "x": 0.5470586712787067, 
     "z": 0.1733135580528603
     },
@@ -41,9 +42,10 @@ In each file the data should be arranged in a structure as shown here:
     }
   }, 
   "stability_score": 1.0
-  }
-
-
+ }
+```
+  
+For sake of clarity, the main parameters of the file are described in the table:
 
 | Parameter | Description | 
 | --- | --- | 
