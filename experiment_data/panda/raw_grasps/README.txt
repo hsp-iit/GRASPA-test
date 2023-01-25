@@ -1,5 +1,5 @@
 
-This folder collect all the data in order to replicate the grasping poses that are executed in the trials for each layout and for each objects. 
+This folder collects all the data in order to replicate the grasping poses that are executed in the trials for each layout and for each objects. 
 For each trial the data are saved in a distinct file grasp_<object>_00<N>.json  where <object> is the name of the target object and <N> (from 0 to 4) is the trial number.
 For example, the file in the path \dexnet\layout_0\grasp_foam_brick.json store the data for the first trial to grab the foam brick, the grasping pose is identified by dexnet in the Layout 0.
 
