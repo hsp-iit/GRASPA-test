@@ -43,8 +43,12 @@ In each file the data should be arranged in a structure as shown here:
   "stability_score": 1.0
   }
 
-"object" the name of the target object
-The "GRASPA_board_pose" is the position of the GRASPA board w.r.t. the robot reference frame
-The "grasp_pose" is the position of the gripper w.r.t. the robot reference frame
-"grasped_score" defined in GRASPA
-"stability_score": defined in GRASPA
+
+
+| Parameter | Description | 
+| --- | --- | 
+**object** | the name of the target object|
+**GRASPA_board_pose** | the position of the GRASPA board w.r.t. the robot reference frame |
+**grasp_pose**  | the position of the gripper w.r.t. the robot reference frame |
+**grasped_score** | grasped quality score (defined in GRASPA)|
+**stability_score** | grasp stability score (defined in GRASPA)|
