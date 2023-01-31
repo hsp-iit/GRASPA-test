@@ -54,3 +54,5 @@ For sake of clarity, the main parameters of the file are described in the table:
 **grasp_pose**  | Position of the gripper w.r.t. the robot reference frame |
 **grasped_score** | Grasped quality score (defined in GRASPA)|
 **stability_score** | Grasp stability score (defined in GRASPA)|
+
+For each grasp trial, we reported also the .xml file with the GRASPA results. These .xml files are copied from the `grasps_data` folder, which is described [here](https://github.com/hsp-iit/GRASPA-test/tree/master/experiment_data/panda).
